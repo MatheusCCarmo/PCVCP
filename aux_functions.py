@@ -36,13 +36,6 @@ def calculate_bonus_colected(route, G):
     return bonus
 
 
-def swap_2_opt(i, j, route):
-    route_A = route[:i]
-    route_B = route[i:j]
-    route_B.reverse()
-    new_route = [*route_A,*route_B, *route[j:]]
-    return new_route
-
 def bonus_labels(route):
     bonus_label = {}
     for i in range(len(route)):
@@ -59,6 +52,8 @@ def load_dataset(file_name):
             if(new_line == 'NODE_COORD_SECTION'):
                 is_coord = True
                 continue
+            elif(new_line == 'EOF'):
+                break
             if(is_coord):
                 new_line = new_line.split(" ")  # split a string into a list
                 id, x, y = new_line[0], new_line[1], new_line[2]  # check dataset file to see why id,x,y = 0,1,2
