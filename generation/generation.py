@@ -1,8 +1,14 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from aux_functions import *
+import random
 
 infinity = 9999999999
+
+generations_size = 200
+population_size = 100
+mut_rate = 0.2
+
 
 def insert_from_closest(G, quota, my_pos):
     # find closest vertex from node 0
@@ -52,4 +58,44 @@ def insert_from_closest(G, quota, my_pos):
         route_edges = [ (route[i-1]['id'],route[i]['id']) for i in range(len(route)) ]
         nx.draw(G.edge_subgraph(route_edges), pos=my_pos, with_labels=True)
 
+    return route
+
+
+
+
+def genetic_algorithm(population, valuation_function, time_limit):
+    init_population(population)
+    avaliation(population)
+    for i in range(generations_size):
+        father_selection(population)
+        crossover(population)
+        mutation(population)
+        avaliation(population)
+
+
+
+def init_population(population, time):
+    return
+
+def avaliation(population, time):
+    return
+
+def father_selection(population, time):
+    return
+
+def crossover(population, time):
+    return
+
+def mutation(population, time):
+    return
+
+
+def generate_random_route(G, quota):
+    bonus_colected = 0
+    route = [G.nodes[0]]
+    while(bonus_colected < quota):
+        random_i = random.randint(0, len(G.nodes) - 1)
+        if(G.nodes[random_i] not in route):
+            bonus_colected += G.nodes[random_i]['bonus']
+            route.append(G.nodes[random_i])
     return route
