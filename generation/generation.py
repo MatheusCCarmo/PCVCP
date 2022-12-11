@@ -1,5 +1,3 @@
-import networkx as nx
-import matplotlib.pyplot as plt
 from aux_functions import *
 import random
 
@@ -106,18 +104,20 @@ def generate_random_route(G, quota):
             route.append(G.nodes[random_i])
     return route
 
-def grasp_construction(G, quota):
+
+
+
+def grasp_construction(G, quota, alfa_grasp):
+    
     route = [G.nodes[0]]
 
     bonus_colected = calculate_bonus_colected(route, G)
     k_best_economy_value = -infinity
 
-
-
     # insert
     while bonus_colected < quota or k_best_economy_value > 0:
         k_best_economy_value = -infinity
-        k_best_economy = 0
+        economy_list = []
         for k in range(len(G.nodes)):
             if G.nodes[k] not in route:
                 if(len(route) == 1):
@@ -130,13 +130,16 @@ def grasp_construction(G, quota):
                     k_edge1 = G.edges[i,k]
                     k_edge2 = G.edges[k,j]
                     k_economy_value = edge['length'] + G.nodes[k]['penalty'] - k_edge1['length'] - k_edge2['length']
-
+                    economy_list.append((k,k_economy_value,r))
                     if k_economy_value > k_best_economy_value:
                         k_best_economy_value = k_economy_value
-                        k_best_economy = k
-                        r_best_economy = r        
-        
-        if(k_best_economy_value > 0 or bonus_colected < quota):
-            route.insert(r_best_economy, G.nodes[k_best_economy])
+        economy_list.sort(key=lambda item: item[1],reverse=True)
+        best_economy = economy_list[0][1]
+        worst_economy = economy_list[-1][1]
+        grasp_tsh = best_economy - alfa_grasp * (best_economy - worst_economy)
+        grasp_candidates = list(filter(lambda item: item[1] >= grasp_tsh, economy_list))
+        insertion_selected = random.choice(grasp_candidates)
+        if(best_economy > 0 or bonus_colected < quota):
+            route.insert(insertion_selected[2], G.nodes[economy_list[0][0]])
         bonus_colected = calculate_bonus_colected(route, G)
     return route
