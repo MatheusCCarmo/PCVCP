@@ -7,16 +7,13 @@ def eucl_dist(x1,y1,x2,y2):
 
 def calculate_route_distance(route, G):
 
-    routeDistanceCost = 0
-    for r in range(len(route)):
-        if r < len(route) -1:
-            i = route[r]['id']
-            j = route[r + 1]['id']
-        else:
-            i = route[r]['id']
-            j = route[0]['id']
-        routeDistanceCost += G.edges[i,j]['length']
-    return routeDistanceCost
+    distance = 0
+    for v in range(len(route)):
+        i = route[v - 1]['id']
+        j = route[v]['id']        
+        distance += G.edges[i,j]['length']
+    return distance
+
 
 def calculate_penalties(route, G):
 
@@ -59,3 +56,10 @@ def load_dataset(file_name):
                 id, x, y = new_line[0], new_line[1], new_line[2]  # check dataset file to see why id,x,y = 0,1,2
                 dataset.append(Vertex(id=id, x=x, y=y))  # Create a Node object with id, x, y and add to the data list
     return dataset
+
+
+def route_cost(route, G):
+    penalties = calculate_penalties(route, G)
+    distance = calculate_route_distance(route, G)
+    cost = penalties + distance
+    return cost
