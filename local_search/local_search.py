@@ -42,6 +42,12 @@ def swap_2_opt(route, G, my_pos):
                     # nx.draw_networkx_labels(G.edge_subgraph(route_edges),  pos=my_pos, labels=bonus_label, font_size=10, font_color="whitesmoke")
     return route
 
+# def vns(route, G, r):
+#     best = route
+#     while False:
+
+
+
 
 # lin-kernighan
 # def lin_kernighan(route, G):
