@@ -1,14 +1,9 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from aux_functions import *
+import math
 
 
-def swap_2(i, j, route):
-    route_A = route[:i]
-    route_B = route[i:j]
-    route_B.reverse()
-    new_route = [*route_A,*route_B, *route[j:]]
-    return new_route
 
 def swap_2_opt(route, G, my_pos):
     cur_length = calculate_route_distance(route, G)
@@ -42,10 +37,41 @@ def swap_2_opt(route, G, my_pos):
                     # nx.draw_networkx_labels(G.edge_subgraph(route_edges),  pos=my_pos, labels=bonus_label, font_size=10, font_color="whitesmoke")
     return route
 
-# def vns(route, G, r):
-#     best = route
-#     while False:
 
+
+def drop_step(route, quota, G):
+    bonus_colected = calculate_bonus_colected(route, G)
+    best_economy = -math.inf
+
+    improved = True
+    
+    # insert
+    while improved:
+        best_economy = -math.inf
+        economy_list = []
+        for r in range(len(route) - 1):
+            i = route[r-1]['id']
+            j = route[r]['id']
+            s = route[r+1]['id']
+            k_edge1 = G.edges[i,j]
+            k_edge2 = G.edges[j,s]
+            edge = G.edges[i,s]
+            k_economy_value = k_edge1['length'] + k_edge2['length'] - edge['length'] - G.nodes[j]['penalty']
+            economy_list.append((j,k_economy_value,r))
+        if(len(economy_list) == 0):
+            continue 
+        economy_list.sort(key=lambda item: item[1],reverse=True)
+        best_economy_item = economy_list[0]
+        best_economy = best_economy_item[1]
+        item_bonus = G.nodes[best_economy_item[0]]['bonus']
+        if(best_economy > 0 and (bonus_colected - item_bonus) > quota):
+            route.remove(G.nodes[best_economy_item[0]])
+            improved = True
+        else:
+            improved = False
+        bonus_colected = calculate_bonus_colected(route, G)
+        
+    return route
 
 
 

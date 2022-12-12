@@ -1,26 +1,23 @@
 from aux_functions import *
 from entities.chromossome import Chromossome as Chromo
 import random
+import math
 
-infinity = 9999999999
-
-generations_size = 200
+generations_size = 10000
 population_size = 100
-mut_rate = 0.2
-recombination_rate = 0.2
 
 
 def insert_from_closest(G, quota):
     route = [G.nodes[0]]
 
     bonus_colected = calculate_bonus_colected(route, G)
-    k_best_economy_value = -infinity
+    k_best_economy_value = -math.inf
 
 
 
     # insert
     while bonus_colected < quota or k_best_economy_value > 0:
-        k_best_economy_value = -infinity
+        k_best_economy_value = -math.inf
         k_best_economy = 0
         for k in range(len(G.nodes)):
             if G.nodes[k] not in route:
@@ -51,23 +48,30 @@ def genetic_algorithm(G, quota):
     population = init_population(G, quota) 
 
     # avaliar soluções geradas
-    evaluate(population)
+    # evaluate(population)
+    
+    populations_fitness = []
 
     for i in range(generations_size):
         # selecionar um conjunto de pais
-        parents_selection(population, 4)
-
+        parent_1 = parents_selection(population, 4)
+        parent_2 = parents_selection(population, 4)
+ 
         # realizar cruzamento de k pais com uma dada probabilidade
-        recombination(population)
+        child_1, child_2 = recombination(parent_1, parent_2, G)
 
         # realizar mutação das soluções geradas
-        new_population = mutation(population)
+        population = mutation(population, G)
 
         # avaliar a aptidao das soluções geradas
-        evaluate(population)
+        populations_fitness.append(evaluate(population))
 
         # atualizar a população
-        population = new_population
+        population.sort(key=lambda item: item.fitness_value, reverse=True)
+        insert_index = random.randint(population_size/2, population_size - 1)
+        population[insert_index] = child_1
+        insert_index = random.randint(population_size/2, population_size - 1)
+        population[insert_index] = child_2
 
     #buscar melhor solução da população
     best = best_solution(population)
@@ -83,12 +87,10 @@ def init_population(G, quota):
     return population
 
 def evaluate(population):
-    best_route = population[0]
-    for i in range(population):
-        fitness_value = population[i].fitness_value
-        if(fitness_value > best_route.fitness_value):
-            best_route = population[i]
-    return best_route
+    fitness_sum = 0
+    for i in range(len(population)):
+        fitness_sum += population[i].fitness_value
+    return fitness_sum/len(population)
 
 def parents_selection(population, k):
     #tournament
@@ -97,14 +99,58 @@ def parents_selection(population, k):
 
     return candidates[0]
  
-def recombination(population):
-    return
+def recombination(parent_1, parent_2, G):
+    child_1, child_2 = crossover_two(parent_1, parent_2)
 
-def mutation(population):
-    return
+    chromo_1 = Chromo(child_1, G)
+    chromo_2 = Chromo(child_2, G)
+
+    return chromo_1, chromo_2
+
+def crossover_two(parent_1, parent_2):  # two points crossover
+    len_min =  begin = min(len(parent_1.route), len(parent_2.route))
+    point_1, point_2 = random.sample(range(1, len_min-1), 2)
+    begin = min(point_1, point_2)
+    end = max(point_1, point_2)
+
+    child_1 = parent_1.route[begin:end]
+    child_2 = parent_2.route[begin:end]
+
+
+    child_1_remain = [item for item in parent_2.route[1:] if item not in child_1]
+    child_2_remain = [item for item in parent_1.route[1:] if item not in child_2]
+
+
+    child_1 += child_1_remain
+    child_2 += child_2_remain
+
+    child_1.insert(0, parent_1.route[0])
+
+    child_2.insert(0, parent_2.route[0])
+
+    return child_1, child_2
+
+def mutation(population, G):
+    choosen = random.choice(population)
+    population.remove(choosen)
+
+    first, second = random.sample(range(1,len(choosen.route)), 2)
+ 
+    i = min(first, second)
+    j = max(first, second)
+
+    new_route = swap_2(i, j, choosen.route)
+    new_chormo = Chromo(new_route, G)
+    population.append(new_chormo)
+    return population
 
 def best_solution(population):
-    return
+    best_chromo = population[0]
+    for i in range(population_size):
+        fitness_value = population[i].fitness_value
+        if(fitness_value > best_chromo.fitness_value):
+            best_chromo = population[i]
+    return best_chromo.route
 
 
 def generate_random_route(G, quota):
@@ -115,18 +161,19 @@ def generate_random_route(G, quota):
         if(G.nodes[random_i] not in route):
             bonus_colected += G.nodes[random_i]['bonus']
             route.append(G.nodes[random_i])
+            
     return route
 
 
 def drop_step(route, quota, G):
     bonus_colected = calculate_bonus_colected(route, G)
-    best_economy = -infinity
+    best_economy = -math.inf
 
     improved = True
     
     # insert
     while improved:
-        best_economy = -infinity
+        best_economy = -math.inf
         economy_list = []
         for r in range(len(route) - 1):
             i = route[r-1]['id']
@@ -153,30 +200,70 @@ def drop_step(route, quota, G):
     return route
 
 
+# def grasp_construction(G, quota, alfa_grasp):
+    
+#     route = [G.nodes[0]]
+
+#     bonus_colected = calculate_bonus_colected(route, G)
+#     best_economy = -math.inf
+
+#     # insert
+#     while bonus_colected < quota or best_economy > 0:
+#         best_economy = -math.inf
+#         economy_list = []
+#         for k in range(len(G.nodes)):
+#             if G.nodes[k] not in route:
+#                 if(len(route) == 1):
+#                     route.insert(1, G.nodes[k])
+#                     continue
+#                 for r in range(len(route)):
+#                     i = route[r-1]['id']
+#                     j = route[r]['id']
+#                     edge = G.edges[i,j]
+#                     k_edge1 = G.edges[i,k]
+#                     k_edge2 = G.edges[k,j]
+#                     k_economy_value = edge['length'] + G.nodes[k]['penalty'] - k_edge1['length'] - k_edge2['length']
+#                     economy_list.append((k,k_economy_value,r))
+#         if(len(economy_list) == 0):
+#             continue 
+#         economy_list.sort(key=lambda item: item[1],reverse=True)
+#         best_economy = economy_list[0][1]
+#         worst_economy = economy_list[-1][1]
+#         grasp_tsh = best_economy - alfa_grasp * (best_economy - worst_economy)
+#         grasp_candidates = list(filter(lambda item: item[1] >= grasp_tsh, economy_list))
+#         insertion_selected = random.choice(grasp_candidates)
+#         if(best_economy > 0 or bonus_colected < quota):
+#             route.insert(insertion_selected[2], G.nodes[insertion_selected[0]])
+#         bonus_colected = calculate_bonus_colected(route, G)
+#     return route
+
+
+
 def grasp_construction(G, quota, alfa_grasp):
     
     route = [G.nodes[0]]
 
     bonus_colected = calculate_bonus_colected(route, G)
-    best_economy = -infinity
+    best_economy = -math.inf
 
     # insert
     while bonus_colected < quota or best_economy > 0:
-        best_economy = -infinity
+        best_economy = -math.inf
         economy_list = []
         for k in range(len(G.nodes)):
             if G.nodes[k] not in route:
-                if(len(route) == 1):
-                    route.insert(1, G.nodes[k])
+                route_len = len(route)
+                if(route_len == 1):
+                    route.append(G.nodes[k])
                     continue
-                for r in range(len(route)):
-                    i = route[r-1]['id']
-                    j = route[r]['id']
-                    edge = G.edges[i,j]
-                    k_edge1 = G.edges[i,k]
-                    k_edge2 = G.edges[k,j]
-                    k_economy_value = edge['length'] + G.nodes[k]['penalty'] - k_edge1['length'] - k_edge2['length']
-                    economy_list.append((k,k_economy_value,r))
+                i = route[-2]['id']
+                j = route[-1]['id']
+                edge = G.edges[i,j]
+                k_edge1 = G.edges[i,k]
+                k_edge2 = G.edges[k,j]
+                k_economy_value = edge['length'] + G.nodes[k]['penalty'] - k_edge1['length'] - k_edge2['length']
+                economy_list.append((k,k_economy_value))
+                   
         if(len(economy_list) == 0):
             continue 
         economy_list.sort(key=lambda item: item[1],reverse=True)
@@ -186,7 +273,7 @@ def grasp_construction(G, quota, alfa_grasp):
         grasp_candidates = list(filter(lambda item: item[1] >= grasp_tsh, economy_list))
         insertion_selected = random.choice(grasp_candidates)
         if(best_economy > 0 or bonus_colected < quota):
-            route.insert(insertion_selected[2], G.nodes[insertion_selected[0]])
+            route.append(G.nodes[insertion_selected[0]])
         bonus_colected = calculate_bonus_colected(route, G)
     return route
 

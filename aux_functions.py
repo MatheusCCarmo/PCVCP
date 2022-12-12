@@ -5,6 +5,13 @@ def eucl_dist(x1,y1,x2,y2):
     return math.sqrt( (x1-x2)**2 + (y1-y2)**2 )
 
 
+def swap_2(i, j, route):
+    route_A = route[:i]
+    route_B = route[i:j]
+    route_B.reverse()
+    new_route = [*route_A,*route_B, *route[j:]]
+    return new_route
+
 def calculate_route_distance(route, G):
 
     distance = 0
