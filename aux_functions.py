@@ -60,6 +60,7 @@ def load_dataset(file_name):
                 break
             if(is_coord):
                 new_line = new_line.split(" ")  # split a string into a list
+                new_line = list(filter(lambda x: x != '', new_line))
                 id, x, y = new_line[0], new_line[1], new_line[2]  # check dataset file to see why id,x,y = 0,1,2
                 dataset.append(Vertex(id=id, x=x, y=y))  # Create a Node object with id, x, y and add to the data list
     return dataset

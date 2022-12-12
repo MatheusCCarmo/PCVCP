@@ -9,7 +9,7 @@ def swap_2_opt(route, G, my_pos):
     cur_length = calculate_route_distance(route, G)
 
     improved = True
-    bonus_label = bonus_labels(route)
+    # bonus_label = bonus_labels(route)
 
     while improved:
         improved = False
@@ -26,7 +26,7 @@ def swap_2_opt(route, G, my_pos):
                     cur_length = new_length
                     route = new_route
                     improved = True
-                    bonus_label = bonus_labels(route)
+                    # bonus_label = bonus_labels(route)
                     
                     # draw the new tour
                     # route_edges = [ (route[i-1]['id'],route[i]['id']) for i in range(len(route)) ]

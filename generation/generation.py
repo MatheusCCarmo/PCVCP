@@ -2,9 +2,10 @@ from aux_functions import *
 from entities.chromossome import Chromossome as Chromo
 import random
 import math
+import time
 
-generations_size = 10000
-population_size = 100
+generations_size = 100000
+population_size = 200
 
 
 def insert_from_closest(G, quota):
@@ -51,8 +52,10 @@ def genetic_algorithm(G, quota):
     # evaluate(population)
     
     populations_fitness = []
+    start_time = time.time()
+    # for i in range(generations_size):
 
-    for i in range(generations_size):
+    while(time.time() - start_time < 30):
         # selecionar um conjunto de pais
         parent_1 = parents_selection(population, 4)
         parent_2 = parents_selection(population, 4)
@@ -72,7 +75,7 @@ def genetic_algorithm(G, quota):
         population[insert_index] = child_1
         insert_index = random.randint(population_size/2, population_size - 1)
         population[insert_index] = child_2
-
+    
     #buscar melhor solução da população
     best = best_solution(population)
     return best
@@ -82,8 +85,9 @@ def genetic_algorithm(G, quota):
 def init_population(G, quota):
     population = []
     for i in range(population_size):
-        random_route = generate_random_route(G, quota)
-        population.append(Chromo(random_route, G))
+        route = grasp_construction(G, quota, 0.1)
+        route = drop_step(route, quota, G)
+        population.append(Chromo(route, G))
     return population
 
 def evaluate(population):
