@@ -1,5 +1,5 @@
 class Vertex:
-    def __init__(self, id, x, y):
-        self.id = int(id) - 1
-        self.x = float(x)
-        self.y = float(y)
+    def __init__(self, id, bonus):
+        self.id = int(id)
+        self.bonus = float(bonus)
+        self.penalty = 50

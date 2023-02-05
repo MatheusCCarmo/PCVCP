@@ -1,83 +1,169 @@
 from aux_functions import *
+from local_search import local_search as ls
 from entities.chromossome import Chromossome as Chromo
 import random
 import math
-import time
-
-generations_size = 100000
-population_size = 200
 
 
-def insert_from_closest(G, quota):
-    route = [G.nodes[0]]
+# 06/01
+# Estado da arte
+# Trazer instancias e algoritmos da literatura
+# Duvidas sobre IRACE, teste estatístico e algoritmos de comparação
 
-    bonus_colected = calculate_bonus_colected(route, G)
-    k_best_economy_value = -math.inf
+#1 Introdução
+# 2 Definição formal do problema
+# 3 O estado da arte
+# 4 O algoritmo desenvolvido
+# 5 Experimentos
+#   5.1 Metodologia 
+#         5.1.1 Descrever as características das instâncias
+#     5.2 Resultados para instâncias simétricas
+#    5.3 Resultados para instâncias assimétricas
+# 6 Conclusão
+# 7 Referências Bibliográficas
+# 10 instâncias simétricas e 10 assimétricas
+
+# https://www.sciencedirect.com/
+# https://link.springer.com/
+# https://sci-hub.se/
+# https://ieeexplore.ieee.org/Xplore/home.jsp
+# https://dl.acm.org/
+
+# Ver Algoritmos para comparação utilizados pelo estado da arte, selecionar 2 mais recentes
+
+# Realizar teste estatístico,
+# Dois testes estatísticos importantes:
+# Kruskal-Wallis (utilizando para comparar mais de dois algoritmos ao mesmo tempo)
+# Mann-Whitney (utilizando para comparar  APENAS dois algoritmos ao mesmo tempo)
+# Nível de significância: 0.05
+# p-valor<0.05, então significa que a primeira amostra (A) é melhor que a segunda (B).
+# se o p-valor>=0.95, então a amostra B é conclusivamente melhor
+# se o p-valor >=0.05 e p-valor<=0.95, então o resutlado é inconclusivo
+# Reportar em tabelas no relatório (pode ser em apêndice)
+
+# TODO: fazer experimentos para descobrir quais valores para os parametros apresenta os melhores resultados, a serem utilizados no experimento final
+# ou
+# usar o IRACE, IRACE recebe o intervalo dos parâmetros, o executável do algoritmo e ALGUMAS instâncias representativas. Devolve os melhores valores para os parâmetros.
+
+#  Não utilizar no IRACE e nos experimentos as mesmas instancias para o trabalho 
 
 
-
-    # insert
-    while bonus_colected < quota or k_best_economy_value > 0:
-        k_best_economy_value = -math.inf
-        k_best_economy = 0
-        for k in range(len(G.nodes)):
-            if G.nodes[k] not in route:
-                if(len(route) == 1):
-                    route.insert(1, G.nodes[k])
-                    continue
-                for r in range(len(route)):
-                    i = route[r-1]['id']
-                    j = route[r]['id']
-                    edge = G.edges[i,j]
-                    k_edge1 = G.edges[i,k]
-                    k_edge2 = G.edges[k,j]
-                    k_economy_value = edge['length'] + G.nodes[k]['penalty'] - k_edge1['length'] - k_edge2['length']
-
-                    if k_economy_value > k_best_economy_value:
-                        k_best_economy_value = k_economy_value
-                        k_best_economy = k
-                        r_best_economy = r        
-        
-        if(k_best_economy_value > 0 or bonus_colected < quota):
-            route.insert(r_best_economy, G.nodes[k_best_economy])
-        bonus_colected = calculate_bonus_colected(route, G)
-    return route
+# Parâmetros do genético:
+# Taxa de mutação, taxa de recombinação (ou taxa de cruzamento), tamanho da população
 
 
-def genetic_algorithm(G, quota):
-    # gerar uma população de soluçõs
+population_size = 100
+mutation_rate = 0.2
+recombination_rate = 0.2
+
+million = 200000
+
+# enquanto critério de parada não for satisfeito faça:
+    # para cada i de 1 até N (onde N é o tamanho da população) faça:
+        # sorteie os pais. Aplique operadores (recombination, mutation).
+        # busca local do resultante da mutação
+    # busca local de alguns filhos gerados
+    # combinar populações de pais e filhos
+# retornar o melhor indivíduo
+
+# taxa de mutação, 
+def memetic_algorithm(G, quota):
     population = init_population(G, quota) 
 
-    # avaliar soluções geradas
-    # evaluate(population)
-    
-    populations_fitness = []
-    start_time = time.time()
-    # for i in range(generations_size):
+    # enquanto critério de parada não for satisfeito faça:
+    while(route_cost.counter < million):
 
-    while(time.time() - start_time < 30):
-        # selecionar um conjunto de pais
-        parent_1 = parents_selection(population, 4)
-        parent_2 = parents_selection(population, 4)
- 
-        # realizar cruzamento de k pais com uma dada probabilidade
-        child_1, child_2 = recombination(parent_1, parent_2, G)
+        children=[]
+        # para cada i de 1 até N (onde N é o tamanho da população) faça:
+        for i in range(population_size):
 
-        # realizar mutação das soluções geradas
-        population = mutation(population, G)
+            # sorteie os pais. Aplique operadores (recombination, mutation).
+            parent_1 = parents_selection(population, 4)
+            parent_2 = parents_selection(population, 4)
 
-        # avaliar a aptidao das soluções geradas
-        populations_fitness.append(evaluate(population))
 
-        # atualizar a população
-        population.sort(key=lambda item: item.fitness_value, reverse=True)
-        insert_index = random.randint(population_size/2, population_size - 1)
-        population[insert_index] = child_1
-        insert_index = random.randint(population_size/2, population_size - 1)
-        population[insert_index] = child_2
-    
+            # aplicar recombinação
+            rand = random.random()
+            if(rand < recombination_rate):
+                child_1, child_2 = recombination(parent_1, parent_2, G)  
+                children.append(child_1)
+                children.append(child_2)
+
+            # aplicar mutação
+            rand = random.random()
+            if(rand < mutation_rate):
+                mutated = mutation(population, G)
+                # busca local do resultante da mutação
+                new_mutated = local_search(mutated, G)
+
+                children.append(new_mutated)
+
+        # busca local de alguns filhos gerados
+        random_children = random.choices(population, k=3)
+        new_child_1 = local_search(random_children[0], G)
+
+        new_child_2 = local_search(random_children[1], G)
+
+        new_child_3 = local_search(random_children[2], G)
+
+
+        children.append(new_child_1)
+        children.append(new_child_2)
+        children.append(new_child_3)
+        
+        new_population = [*population, *children]
+
+        new_population.sort(key=lambda item: item.fitness_value(), reverse=True)
+
+        population = new_population[:population_size]
+
+
     #buscar melhor solução da população
     best = best_solution(population)
+    route_cost.counter = 0
+
+    return best
+
+def genetic_algorithm(G, quota):
+    population = init_population(G, quota) 
+
+    # enquanto critério de parada não for satisfeito faça:
+    while(route_cost.counter < million):
+
+        children=[]
+        # para cada i de 1 até N (onde N é o tamanho da população) faça:
+        for i in range(population_size):
+
+            # sorteie os pais. Aplique operadores (recombination, mutation).
+            parent_1 = parents_selection(population, 4)
+            parent_2 = parents_selection(population, 4)
+
+
+            # aplicar recombinação
+            rand = random.random()
+            if(rand < recombination_rate):
+                child_1, child_2 = recombination(parent_1, parent_2, G)  
+                children.append(child_1)
+                children.append(child_2)
+
+            # aplicar mutação
+            rand = random.random()
+            if(rand < mutation_rate):
+                mutated = mutation(population, G)
+                # busca local do resultante da mutação
+                new_mutated = local_search(mutated, G)
+
+                children.append(mutated)
+        
+        new_population = [*population, *children]
+        new_population.sort(key=lambda item: item.fitness_value(), reverse=True)
+        population = new_population[:population_size]
+
+
+    #buscar melhor solução da população
+    best = best_solution(population)
+    route_cost.counter = 0
+
     return best
 
 
@@ -85,21 +171,25 @@ def genetic_algorithm(G, quota):
 def init_population(G, quota):
     population = []
     for i in range(population_size):
-        route = grasp_construction(G, quota, 0.1)
-        route = drop_step(route, quota, G)
+        route = generate_random_route(G, quota)
         population.append(Chromo(route, G))
     return population
 
 def evaluate(population):
+
     fitness_sum = 0
     for i in range(len(population)):
         fitness_sum += population[i].fitness_value
+
     return fitness_sum/len(population)
 
 def parents_selection(population, k):
+
+
     #tournament
     candidates = random.choices(population, k=k)
-    candidates.sort(key=lambda item: item.fitness_value, reverse=True)
+    candidates.sort(key=lambda item: item.fitness_value(), reverse=True)
+    
 
     return candidates[0]
  
@@ -131,12 +221,11 @@ def crossover_two(parent_1, parent_2):  # two points crossover
     child_1.insert(0, parent_1.route[0])
 
     child_2.insert(0, parent_2.route[0])
-
+    
     return child_1, child_2
 
 def mutation(population, G):
     choosen = random.choice(population)
-    population.remove(choosen)
 
     first, second = random.sample(range(1,len(choosen.route)), 2)
  
@@ -145,14 +234,20 @@ def mutation(population, G):
 
     new_route = swap_2(i, j, choosen.route)
     new_chormo = Chromo(new_route, G)
-    population.append(new_chormo)
-    return population
+    return new_chormo
+
+
+def local_search(chromo, G):
+    new_route = ls.swap_2_opt(chromo.route, G)
+    new_chromo = Chromo(new_route, G)
+
+    return new_chromo
 
 def best_solution(population):
     best_chromo = population[0]
     for i in range(population_size):
-        fitness_value = population[i].fitness_value
-        if(fitness_value > best_chromo.fitness_value):
+        fitness_value = population[i].fitness_value()
+        if(fitness_value > best_chromo.fitness_value()):
             best_chromo = population[i]
     return best_chromo.route
 
@@ -186,7 +281,7 @@ def drop_step(route, quota, G):
             k_edge1 = G.edges[i,j]
             k_edge2 = G.edges[j,s]
             edge = G.edges[i,s]
-            k_economy_value = k_edge1['length'] + k_edge2['length'] - edge['length'] - G.nodes[j]['penalty']
+            k_economy_value = k_edge1['weight'] + k_edge2['weight'] - edge['weight'] - G.nodes[j]['penalty']
             economy_list.append((j,k_economy_value,r))
         if(len(economy_list) == 0):
             continue 
@@ -226,7 +321,7 @@ def drop_step(route, quota, G):
 #                     edge = G.edges[i,j]
 #                     k_edge1 = G.edges[i,k]
 #                     k_edge2 = G.edges[k,j]
-#                     k_economy_value = edge['length'] + G.nodes[k]['penalty'] - k_edge1['length'] - k_edge2['length']
+#                     k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - k_edge1['weight'] - k_edge2['weight']
 #                     economy_list.append((k,k_economy_value,r))
 #         if(len(economy_list) == 0):
 #             continue 
@@ -265,7 +360,7 @@ def grasp_construction(G, quota, alfa_grasp):
                 edge = G.edges[i,j]
                 k_edge1 = G.edges[i,k]
                 k_edge2 = G.edges[k,j]
-                k_economy_value = edge['length'] + G.nodes[k]['penalty'] - k_edge1['length'] - k_edge2['length']
+                k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - k_edge1['weight'] - k_edge2['weight']
                 economy_list.append((k,k_economy_value))
                    
         if(len(economy_list) == 0):
