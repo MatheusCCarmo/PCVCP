@@ -1,4 +1,6 @@
 import math
+import matplotlib.pyplot as plt
+import networkx as nx
 from entities.vertex import Vertex
 
 calculations_counter = 0
@@ -133,3 +135,16 @@ def route_cost(route, G):
     return cost
 
 route_cost.counter = 0
+
+
+def report(duration, route, G):
+    print(f"Finished in {duration:0.4f} seconds")
+    cost = route_cost(route, G)
+    bonus = calculate_bonus_colected(route, G)
+    print('Cost:', cost)
+    print('Bonus Colected:', bonus)
+
+def plot(route, G):
+    plt.figure()
+    route_edges = [ (route[i-1]['id'],route[i]['id']) for i in range(len(route))]
+    nx.draw(G.edge_subgraph(route_edges), with_labels=True)
