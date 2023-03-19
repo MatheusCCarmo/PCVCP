@@ -1,2 +1,0 @@
-MeméticoRoute - Cost - Duration
-[{'bonus': 0.0, 'penalty': 50, 'id': 0}, {'bonus': 901.0, 'penalty': 50, 'id': 1}, {'bonus': 726.0, 'penalty': 50, 'id': 4}, {'bonus': 550.0, 'penalty': 50, 'id': 7}, {'bonus': 941.0, 'penalty': 50, 'id': 5}] - 994.0 - 1.599

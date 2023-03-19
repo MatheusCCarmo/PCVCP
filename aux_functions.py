@@ -90,41 +90,41 @@ def load_dataset(file_name):
         
     return n, quota, matrix, dataset
 
-def load_symmetric(file_name):
-    dataset = []
-    is_coord = False
-    with open(file_name, "r") as f:
-        for line in f:
-            new_line = line.strip()  # remove spaces at the beginning and the end if they are available
-            if(new_line == 'NODE_COORD_SECTION' or new_line == 'DISPLAY_DATA_SECTION'):
-                is_coord = True
-                continue
-            elif(new_line == 'EOF'):
-                break
-            if(is_coord):
-                new_line = new_line.split(" ")  # split a string into a list
-                new_line = list(filter(lambda x: x != '', new_line))
-                id, x, y = new_line[0], new_line[1], new_line[2]  # check dataset file to see why id,x,y = 0,1,2
-                dataset.append(Vertex(id=id, x=x, y=y))  # Create a Node object with id, x, y and add to the data list
-    return dataset
+# def load_symmetric(file_name):
+#     dataset = []
+#     is_coord = False
+#     with open(file_name, "r") as f:
+#         for line in f:
+#             new_line = line.strip()  # remove spaces at the beginning and the end if they are available
+#             if(new_line == 'NODE_COORD_SECTION' or new_line == 'DISPLAY_DATA_SECTION'):
+#                 is_coord = True
+#                 continue
+#             elif(new_line == 'EOF'):
+#                 break
+#             if(is_coord):
+#                 new_line = new_line.split(" ")  # split a string into a list
+#                 new_line = list(filter(lambda x: x != '', new_line))
+#                 id, x, y = new_line[0], new_line[1], new_line[2]  # check dataset file to see why id,x,y = 0,1,2
+#                 dataset.append(Vertex(id=id, x=x, y=y))  # Create a Node object with id, x, y and add to the data list
+#     return dataset
 
-def load_asymmetric(file_name):
-    dataset = []
-    is_coord = False
-    with open(file_name, "r") as f:
-        for line in f:
-            new_line = line.strip()  # remove spaces at the beginning and the end if they are available
-            if(new_line == 'NODE_COORD_SECTION' or new_line == 'DISPLAY_DATA_SECTION'):
-                is_coord = True
-                continue
-            elif(new_line == 'EOF'):
-                break
-            if(is_coord):
-                new_line = new_line.split(" ")  # split a string into a list
-                new_line = list(filter(lambda x: x != '', new_line))
-                id, x, y = new_line[0], new_line[1], new_line[2]  # check dataset file to see why id,x,y = 0,1,2
-                dataset.append(Vertex(id=id, x=x, y=y))  # Create a Node object with id, x, y and add to the data list
-    return dataset
+# def load_asymmetric(file_name):
+#     dataset = []
+#     is_coord = False
+#     with open(file_name, "r") as f:
+#         for line in f:
+#             new_line = line.strip()  # remove spaces at the beginning and the end if they are available
+#             if(new_line == 'NODE_COORD_SECTION' or new_line == 'DISPLAY_DATA_SECTION'):
+#                 is_coord = True
+#                 continue
+#             elif(new_line == 'EOF'):
+#                 break
+#             if(is_coord):
+#                 new_line = new_line.split(" ")  # split a string into a list
+#                 new_line = list(filter(lambda x: x != '', new_line))
+#                 id, x, y = new_line[0], new_line[1], new_line[2]  # check dataset file to see why id,x,y = 0,1,2
+#                 dataset.append(Vertex(id=id, x=x, y=y))  # Create a Node object with id, x, y and add to the data list
+#     return dataset
 
 
 def route_cost(route, G):

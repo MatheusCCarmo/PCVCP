@@ -5,11 +5,24 @@ import random
 import math
 import time
 
+# Passo a passo
+
+# Buscar o ótimo das instancias atuais
+# Implementar as mesmas instancias utilizadas pelo outro algoritmo
+# Descobrir por que o meu ta demorando mais
+# Implementar os algoritmos de Grasp
+# Utilizar o IRACE para obter melhores taxas
+# Relatorio de todos algorítmos
+# Estado da arte + Modelagem do problema
+
+
+
 
 # 06/01
 # Estado da arte
 # Trazer instancias e algoritmos da literatura
-# Duvidas sobre IRACE, teste estatístico e algoritmos de comparação
+# Utilizar o IRACE para descobrir os melhores valores para as taxas nos algoritmos (mutation_rate, recombination_rate)
+# teste estatístico e algoritmos de comparação
 
 
 # teste estatistico 
@@ -63,7 +76,7 @@ population_size = 100
 mutation_rate = 0.2
 recombination_rate = 0.2
 
-million = 200000
+million = 1000000
 
 # enquanto critério de parada não for satisfeito faça:
     # para cada i de 1 até N (onde N é o tamanho da população) faça:
