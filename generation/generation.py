@@ -7,22 +7,16 @@ import time
 
 # Passo a passo
 
-# Buscar o ótimo das instancias atuais
-# Implementar as mesmas instancias utilizadas pelo outro algoritmo
-# Descobrir por que o meu ta demorando mais
-# Implementar os algoritmos de Grasp
-# Utilizar o IRACE para obter melhores taxas
-# Relatorio de todos algorítmos
-# Estado da arte + Modelagem do problema
 
-
-
-
-# 06/01
-# Estado da arte
-# Trazer instancias e algoritmos da literatura
+# Imprimir relatório - OK
+# Implementar os algoritmos de Grasp - 
+# Buscar o ótimo das instancias atuais - ....
+# Implementar as mesmas instancias utilizadas pelo outro algoritmo - OK
+# Descobrir por que o meu ta demorando mais - ?
 # Utilizar o IRACE para descobrir os melhores valores para as taxas nos algoritmos (mutation_rate, recombination_rate)
-# teste estatístico e algoritmos de comparação
+# Relatorio de todos algorítmos - OK...
+# Teste estatístico e algoritmos de comparação
+# Estado da arte + Modelagem do problema
 
 
 # teste estatistico 
@@ -204,12 +198,15 @@ def grasp_algorithm(quota, G):
         if(route in grasp_solutions):
             continue
         grasp_solutions.append(route)
-
+        print('-')
         route = ls.drop_step(route, quota, G)
+        print('-----------------')
 
         route = ls.swap_2_opt(route, G)
+        print('-----------------------------------')
         
         cost = route_cost(route, G)
+        print('-----------------------------------------------------')
 
         if(cost < best_cost):
             best_route = route
