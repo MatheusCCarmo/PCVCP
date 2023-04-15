@@ -9,32 +9,66 @@ import time
 
 
 # Imprimir relatório - OK
-# Implementar os algoritmos de Grasp - 
-# Buscar o ótimo das instancias atuais - ....
+# Implementar 3 memeticos, o meu, o com vnd, o com vns e o com vns e vnd // TODO:
+# Implementar os algoritmos de Grasp - ...
+# Buscar o ótimo das instancias atuais - ...
 # Implementar as mesmas instancias utilizadas pelo outro algoritmo - OK
 # Descobrir por que o meu ta demorando mais - ?
 # Utilizar o IRACE para descobrir os melhores valores para as taxas nos algoritmos (mutation_rate, recombination_rate)
 # Relatorio de todos algorítmos - OK...
 # Teste estatístico e algoritmos de comparação
-# Estado da arte + Modelagem do problema
+# Estado da arte + Modelagem do problema // TODO:
+# IRACE - 
+
+# 2 Etapas
+#   2.1. comparar os algoritmos memeticos entre si e os grasps entre si e reportar os experimentos no trabalho para encontrar o melhor grasp e o melhor memetico
+#   2.2. comparar os resultados dos algritmos elegidos com o algoritmo da literatura
+#   2.3. comparar os resultados dos algritmos elegidos com o ótimos das instancias
+
+# investigar o solver do python e o algoritmo q ele usa //
+#   Mixed integer Programming Solver using Coin CBC.
 
 
-# teste estatistico 
-  # teste T
-  # teste de mann-whitney U
+# 1. Introdução:
+# 1.2 Contextualização e Motivação
+# 1.3 Objetivos
+# Gerais e especificos
+# 1.4 Metodologia de Pesquisa
+# 1.5 Contribuições desse trabalho para a literatura
+# 1.6 Estrutura do Trabalho
+# 2. Definição Formal do Problema
+# 3
 
 
-#1 Introdução
-# 2 Definição formal do problema
-# 3 O estado da arte
-# 4 O algoritmo desenvolvido
+# teste estatistico
+# teste T
+# teste de mann-whitney U
+
+
+# 1 Introdução
+# 2 Definição formal do problema - FAZER
+# 3 O estado da arte - FAZER - Um artigo por parágrafo
+# 4 O algoritmo desenvolvido - FAZER
 # 5 Experimentos
-#   5.1 Metodologia 
-#         5.1.1 Descrever as características das instâncias
-#     5.2 Resultados para instâncias simétricas
-#    5.3 Resultados para instâncias assimétricas
-# 6 Conclusão
+#   5.1 Metodologia
+#       5.1.1 Descrever as características das instâncias
+#   5.2 Resultados
+#       5.21 Resultados para instâncias simétricas
+#       5.22 Resultados para instâncias assimétricas
+# 6 Conclusão | Considerações
 # 7 Referências Bibliográficas
+
+
+# 5 Experimentos
+# 		5.1 Metodologia
+# 			Características das instâncias, dos testes estatísitocos, quais análises serão feitas, parâmetros, e algoritmos comparativos.
+# 		5.2 Resultaods
+# 				5.2.1 Comparação dos algoritmos entre si
+# 						Comparar os algoritmos propostos entre si, todos com todos, utilizando o teste de Kruskal-Wallis. Eleger o melhor grasp e o melhor memético. Utilizar instâncias simétricas e assimétricas.
+				# 5.2.2 Comparação com a literatura.
+					# 	Comparar os dois melhores algoritmos com os do solver
+
+
 # 10 instâncias simétricas e 10 assimétricas
 
 # https://www.sciencedirect.com/
@@ -59,7 +93,7 @@ import time
 # ou
 # usar o IRACE, IRACE recebe o intervalo dos parâmetros, o executável do algoritmo e ALGUMAS instâncias representativas. Devolve os melhores valores para os parâmetros.
 
-#  Não utilizar no IRACE e nos experimentos as mesmas instancias para o trabalho 
+#  Não utilizar no IRACE e nos experimentos as mesmas instancias para o trabalho
 
 
 # Parâmetros do genético:
@@ -73,11 +107,11 @@ recombination_rate = 0.2
 million = 1000000
 
 # enquanto critério de parada não for satisfeito faça:
-    # para cada i de 1 até N (onde N é o tamanho da população) faça:
-        # sorteie os pais. Aplique operadores (recombination, mutation).
-        # busca local do resultante da mutação
-    # busca local de alguns filhos gerados
-    # combinar populações de pais e filhos
+# para cada i de 1 até N (onde N é o tamanho da população) faça:
+# sorteie os pais. Aplique operadores (recombination, mutation).
+# busca local do resultante da mutação
+# busca local de alguns filhos gerados
+# combinar populações de pais e filhos
 # retornar o melhor indivíduo
 
 # usar GUROBI
@@ -87,12 +121,12 @@ million = 1000000
 
 
 def memetic_algorithm(G, quota):
-    population = init_population(G, quota) 
+    population = init_population(G, quota)
 
     # enquanto critério de parada não for satisfeito faça:
-    while(route_cost.counter < million):
+    while (route_cost.counter < million):
 
-        children=[]
+        children = []
         # para cada i de 1 até N (onde N é o tamanho da população) faça:
         for i in range(population_size):
 
@@ -100,56 +134,55 @@ def memetic_algorithm(G, quota):
             parent_1 = parents_selection(population, 4)
             parent_2 = parents_selection(population, 4)
 
-
             # aplicar recombinação
             rand = random.random()
-            if(rand < recombination_rate):
-                child_1, child_2 = recombination(parent_1, parent_2, G)  
+            if (rand < recombination_rate):
+                child_1, child_2 = recombination(parent_1, parent_2, G)
                 children.append(child_1)
                 children.append(child_2)
 
             # aplicar mutação
             rand = random.random()
-            if(rand < mutation_rate):
+            if (rand < mutation_rate):
                 mutated = mutation(population, G)
                 # busca local do resultante da mutação
-                new_mutated = local_search(mutated, G)
+                new_mutated = local_search(mutated, quota, G)
 
                 children.append(new_mutated)
 
         # busca local de alguns filhos gerados
         random_children = random.choices(population, k=3)
-        new_child_1 = local_search(random_children[0], G)
+        new_child_1 = local_search(random_children[0], quota, G)
 
-        new_child_2 = local_search(random_children[1], G)
+        new_child_2 = local_search(random_children[1], quota, G)
 
-        new_child_3 = local_search(random_children[2], G)
-
+        new_child_3 = local_search(random_children[2], quota, G)
 
         children.append(new_child_1)
         children.append(new_child_2)
         children.append(new_child_3)
-        
+
         new_population = [*population, *children]
 
-        new_population.sort(key=lambda item: item.fitness_value(), reverse=True)
+        new_population.sort(
+            key=lambda item: item.fitness_value(), reverse=True)
 
         population = new_population[:population_size]
 
-
-    #buscar melhor solução da população
+    # buscar melhor solução da população
     best = best_genetic_solution(population)
     route_cost.counter = 0
 
     return best
 
-def genetic_algorithm(G, quota):
-    population = init_population(G, quota) 
+
+def vns_vnd_memetic_algorithm(G, quota):
+    population = init_population(G, quota)
 
     # enquanto critério de parada não for satisfeito faça:
-    while(route_cost.counter < million):
+    while (route_cost.counter < million):
 
-        children=[]
+        children = []
         # para cada i de 1 até N (onde N é o tamanho da população) faça:
         for i in range(population_size):
 
@@ -157,65 +190,289 @@ def genetic_algorithm(G, quota):
             parent_1 = parents_selection(population, 4)
             parent_2 = parents_selection(population, 4)
 
-
             # aplicar recombinação
             rand = random.random()
-            if(rand < recombination_rate):
-                child_1, child_2 = recombination(parent_1, parent_2, G)  
+            if (rand < recombination_rate):
+                child_1, child_2 = recombination(parent_1, parent_2, G)
                 children.append(child_1)
                 children.append(child_2)
 
             # aplicar mutação
             rand = random.random()
-            if(rand < mutation_rate):
+            if (rand < mutation_rate):
                 mutated = mutation(population, G)
                 # busca local do resultante da mutação
-                new_mutated = local_search(mutated, G)
+                new_mutated_route = vns_vnd(mutated.route, quota, G)
+                new_mutated = Chromo(new_mutated_route, G)
+                children.append(new_mutated)
 
-                children.append(mutated)
-        
+        # busca local de alguns filhos gerados
+        random_children = random.choices(population, k=3)
+        new_child_1_route = vns_vnd(random_children[0], quota, G)
+
+        new_child_2_route = vns_vnd(random_children[1], quota, G)
+
+        new_child_3_route = vns_vnd(random_children[2], quota, G)
+
+        new_child_1 = Chromo(new_child_1_route, G)
+        new_child_2 = Chromo(new_child_2_route, G)
+        new_child_3 = Chromo(new_child_3_route, G)
+
+        children.append(new_child_1)
+        children.append(new_child_2)
+        children.append(new_child_3)
+
         new_population = [*population, *children]
-        new_population.sort(key=lambda item: item.fitness_value(), reverse=True)
+
+        new_population.sort(
+            key=lambda item: item.fitness_value(), reverse=True)
+
         population = new_population[:population_size]
 
-
-    #buscar melhor solução da população
+    # buscar melhor solução da população
     best = best_genetic_solution(population)
     route_cost.counter = 0
 
     return best
 
 
-def grasp_algorithm(quota, G):
+def vnd_memetic_algorithm(G, quota):
+    population = init_population(G, quota)
+
+    # enquanto critério de parada não for satisfeito faça:
+    while (route_cost.counter < million):
+
+        children = []
+        # para cada i de 1 até N (onde N é o tamanho da população) faça:
+        for i in range(population_size):
+
+            # sorteie os pais. Aplique operadores (recombination, mutation).
+            parent_1 = parents_selection(population, 4)
+            parent_2 = parents_selection(population, 4)
+
+            # aplicar recombinação
+            rand = random.random()
+            if (rand < recombination_rate):
+                child_1, child_2 = recombination(parent_1, parent_2, G)
+                children.append(child_1)
+                children.append(child_2)
+
+            # aplicar mutação
+            rand = random.random()
+            if (rand < mutation_rate):
+                mutated = mutation(population, G)
+                # busca local do resultante da mutação
+                new_mutated_route = vnd(mutated.route, quota, G)
+                new_mutated = Chromo(new_mutated_route, G)
+
+                children.append(new_mutated)
+
+        # busca local de alguns filhos gerados
+        random_children = random.choices(population, k=3)
+        new_child_1_route = vnd(random_children[0], quota, G)
+
+        new_child_2_route = vnd(random_children[1], quota, G)
+
+        new_child_3_route = vnd(random_children[2], quota, G)
+
+        new_child_1 = Chromo(new_child_1_route, G)
+        new_child_2 = Chromo(new_child_2_route, G)
+        new_child_3 = Chromo(new_child_3_route, G)
+
+        children.append(new_child_1)
+        children.append(new_child_2)
+        children.append(new_child_3)
+
+        new_population = [*population, *children]
+
+        new_population.sort(
+            key=lambda item: item.fitness_value(), reverse=True)
+
+        population = new_population[:population_size]
+
+    # buscar melhor solução da população
+    best = best_genetic_solution(population)
+    route_cost.counter = 0
+
+    return best
+
+
+def genetic_algorithm(G, quota):
+    population = init_population(G, quota)
+
+    # enquanto critério de parada não for satisfeito faça:
+    while (route_cost.counter < million):
+
+        children = []
+        # para cada i de 1 até N (onde N é o tamanho da população) faça:
+        for i in range(population_size):
+
+            # sorteie os pais. Aplique operadores (recombination, mutation).
+            parent_1 = parents_selection(population, 4)
+            parent_2 = parents_selection(population, 4)
+
+            # aplicar recombinação
+            rand = random.random()
+            if (rand < recombination_rate):
+                child_1, child_2 = recombination(parent_1, parent_2, G)
+                children.append(child_1)
+                children.append(child_2)
+
+            # aplicar mutação
+            rand = random.random()
+            if (rand < mutation_rate):
+                mutated = mutation(population, G)
+                # busca local do resultante da mutação
+                new_mutated = local_search(mutated, quota, G)
+
+                children.append(new_mutated)
+
+        new_population = [*population, *children]
+        new_population.sort(
+            key=lambda item: item.fitness_value(), reverse=True)
+        population = new_population[:population_size]
+
+    # buscar melhor solução da população
+    best = best_genetic_solution(population)
+    route_cost.counter = 0
+
+    return best
+
+
+def grasp_algorithm(G, quota):
     grasp_solutions = []
     alfa_grasp = 0.1
     best_cost = math.inf
 
-    while(route_cost.counter < million):
+    counter = 0
+
+    while (route_cost.counter < million):
 
         route = grasp_construction(G, quota, alfa_grasp)
-        
-        if(route in grasp_solutions):
-            continue
+
+        # if counter > 40:
+        #     break
+
+        # if (route in grasp_solutions):
+        #     counter += 1
+        #     continue
+
+        counter = 0
+
         grasp_solutions.append(route)
-        print('-')
+
         route = ls.drop_step(route, quota, G)
-        print('-----------------')
 
-        route = ls.swap_2_opt(route, G)
-        print('-----------------------------------')
-        
+        route = ls.swap_2_opt(route, quota, G)
+
         cost = route_cost(route, G)
-        print('-----------------------------------------------------')
 
-        if(cost < best_cost):
+        if (cost < best_cost):
             best_route = route
             best_cost = cost
-
 
     route_cost.counter = 0
     return best_route
 
+
+def adaptative_grasp_algorithm(G, quota):
+    best_cost = math.inf
+
+    while (route_cost.counter < million):
+        iterations = 5000
+        k_itr = 100
+        k = k_itr
+
+        alfa1 = []
+        alfa2 = []
+        alfa3 = []
+        alfa4 = []
+
+        grasp_solutions = []
+
+        alfas = [0.1, 0.2, 0.3, 0.4]
+        weights = [1, 1, 1, 1]
+
+        count1 = 0
+
+        for i in range(iterations):
+            alfa_grasp = random.choices(alfas, weights=weights, k=1)[0]
+
+            route = grasp_construction(G, quota, alfa_grasp)
+
+            if (route in grasp_solutions):
+                count1 += 1
+                continue
+            grasp_solutions.append(route)
+
+            # ls_counter_start = time.perf_counter()
+            route = ls.drop_step(route, quota, G)
+
+            route = ls.swap_2_opt(route, quota, G)
+            # ls_counter_end = time.perf_counter()
+
+            cost = route_cost(route, G)
+
+            if (alfa_grasp == alfas[0]):
+                alfa1.append(cost)
+            if (alfa_grasp == alfas[1]):
+                alfa2.append(cost)
+            if (alfa_grasp == alfas[2]):
+                alfa3.append(cost)
+            if (alfa_grasp == alfas[3]):
+                alfa4.append(cost)
+
+            # print(f"GRASP Finished in {grasp_counter_end - grasp_counter_start:0.4f} seconds")
+            # print(f"LOCAL SEARCH Finished in {ls_counter_end - ls_counter_start:0.4f} seconds")
+
+            if (cost < best_cost):
+                best_route = route
+                best_cost = cost
+                # alfa_best = alfa_grasp
+
+            if (i == k):
+                # plt.plot(alfas, weights)
+
+                # plt.xlabel('Valores de Alfa')
+                # plt.ylabel('Pesos')
+                # plt.show()
+                alfa1_av = sum(alfa1) / len(alfa1)
+                alfa2_av = sum(alfa2) / len(alfa2)
+                alfa3_av = sum(alfa3) / len(alfa3)
+                alfa4_av = sum(alfa4) / len(alfa4)
+
+                q1 = best_cost/alfa1_av
+                q2 = best_cost/alfa2_av
+                q3 = best_cost/alfa3_av
+                q4 = best_cost/alfa4_av
+                q_total = q1+q2+q3+q4
+                weights = [q1/q_total, q2/q_total, q3/q_total, q4/q_total]
+                k += k_itr
+
+        # print(weights)
+        # print('alfa_best',alfa_best)
+
+        # alfa1_av = sum(alfa1) / len(alfa1)
+        # alfa2_av = sum(alfa2) / len(alfa2)
+        # alfa3_av = sum(alfa3) / len(alfa3)
+        # alfa4_av = sum(alfa4) / len(alfa4)
+
+        # plt.plot(alfas, [alfa1_av, alfa2_av, alfa3_av, alfa4_av])
+
+        # plt.xlabel('Valores de Alfa')
+        # plt.ylabel('Custos')
+        # plt.show()
+
+        # plt.figure()
+        # route_edges = [(best_route[i-1]['id'], best_route[i]['id'])
+        #                for i in range(len(best_route))]
+        # nx.draw(G.edge_subgraph(route_edges), pos=my_pos, with_labels=True)
+
+    # bonus = calculate_bonus_colected(route, G)
+    # print('cost', cost)
+    # print('bonus', bonus)
+    route_cost.counter = 0
+    return best_route
 
 
 # GENETIC AUX
@@ -227,6 +484,7 @@ def init_population(G, quota):
         population.append(Chromo(route, G))
     return population
 
+
 def evaluate(population):
 
     fitness_sum = 0
@@ -235,12 +493,14 @@ def evaluate(population):
 
     return fitness_sum/len(population)
 
+
 def parents_selection(population, k):
     candidates = random.choices(population, k=k)
     candidates.sort(key=lambda item: item.fitness_value(), reverse=True)
 
     return candidates[0]
- 
+
+
 def recombination(parent_1, parent_2, G):
     child_1, child_2 = crossover_two(parent_1, parent_2)
 
@@ -249,8 +509,9 @@ def recombination(parent_1, parent_2, G):
 
     return chromo_1, chromo_2
 
+
 def crossover_two(parent_1, parent_2):  # two points crossover
-    len_min =  begin = min(len(parent_1.route), len(parent_2.route))
+    len_min = begin = min(len(parent_1.route), len(parent_2.route))
     point_1, point_2 = random.sample(range(1, len_min-1), 2)
     begin = min(point_1, point_2)
     end = max(point_1, point_2)
@@ -258,10 +519,10 @@ def crossover_two(parent_1, parent_2):  # two points crossover
     child_1 = parent_1.route[begin:end]
     child_2 = parent_2.route[begin:end]
 
-
-    child_1_remain = [item for item in parent_2.route[1:] if item not in child_1]
-    child_2_remain = [item for item in parent_1.route[1:] if item not in child_2]
-
+    child_1_remain = [
+        item for item in parent_2.route[1:] if item not in child_1]
+    child_2_remain = [
+        item for item in parent_1.route[1:] if item not in child_2]
 
     child_1 += child_1_remain
     child_2 += child_2_remain
@@ -269,15 +530,16 @@ def crossover_two(parent_1, parent_2):  # two points crossover
     child_1.insert(0, parent_1.route[0])
 
     child_2.insert(0, parent_2.route[0])
-    
+
     return child_1, child_2
 
+
 def mutation(population, G):
-    #TODO: adicionartaxa de mutação
+    # TODO: adicionartaxa de mutação
     choosen = random.choice(population)
 
-    first, second = random.sample(range(1,len(choosen.route)), 2)
- 
+    first, second = random.sample(range(1, len(choosen.route)), 2)
+
     i = min(first, second)
     j = max(first, second)
 
@@ -285,17 +547,19 @@ def mutation(population, G):
     new_chormo = Chromo(new_route, G)
     return new_chormo
 
-def local_search(chromo, G):
-    new_route = ls.swap_2_opt(chromo.route, G)
+
+def local_search(chromo, quota, G):
+    new_route = ls.swap_2_opt(chromo.route, quota, G)
     new_chromo = Chromo(new_route, G)
 
     return new_chromo
+
 
 def best_genetic_solution(population):
     best_chromo = population[0]
     for i in range(population_size):
         fitness_value = population[i].fitness_value()
-        if(fitness_value > best_chromo.fitness_value()):
+        if (fitness_value > best_chromo.fitness_value()):
             best_chromo = population[i]
     return best_chromo.route
 
@@ -303,12 +567,12 @@ def best_genetic_solution(population):
 def generate_random_route(G, quota):
     bonus_colected = 0
     route = [G.nodes[0]]
-    while(bonus_colected < quota):
+    while (bonus_colected < quota):
         random_i = random.randrange(0, len(G.nodes))
-        if(G.nodes[random_i] not in route):
+        if (G.nodes[random_i] not in route):
             bonus_colected += G.nodes[random_i]['bonus']
             route.append(G.nodes[random_i])
-            
+
     return route
 
 
@@ -319,7 +583,7 @@ def drop_step(route, quota, G):
     best_economy = -math.inf
 
     improved = True
-    
+
     while improved:
         best_economy = -math.inf
         economy_list = []
@@ -327,29 +591,29 @@ def drop_step(route, quota, G):
             i = route[r-1]['id']
             j = route[r]['id']
             s = route[r+1]['id']
-            k_edge1 = G.edges[i,j]
-            k_edge2 = G.edges[j,s]
-            edge = G.edges[i,s]
-            k_economy_value = k_edge1['weight'] + k_edge2['weight'] - edge['weight'] - G.nodes[j]['penalty']
-            economy_list.append((j,k_economy_value,r))
-        if(len(economy_list) == 0):
-            continue 
-        economy_list.sort(key=lambda item: item[1],reverse=True)
+            k_edge1 = G.edges[i, j]
+            k_edge2 = G.edges[j, s]
+            edge = G.edges[i, s]
+            k_economy_value = k_edge1['weight'] + k_edge2['weight'] - \
+                edge['weight'] - G.nodes[j]['penalty']
+            economy_list.append((j, k_economy_value, r))
+        if (len(economy_list) == 0):
+            continue
+        economy_list.sort(key=lambda item: item[1], reverse=True)
         best_economy_item = economy_list[0]
         best_economy = best_economy_item[1]
         item_bonus = G.nodes[best_economy_item[0]]['bonus']
-        if(best_economy > 0 and (bonus_colected - item_bonus) > quota):
+        if (best_economy > 0 and (bonus_colected - item_bonus) > quota):
             route.remove(G.nodes[best_economy_item[0]])
             improved = True
         else:
             improved = False
         bonus_colected = calculate_bonus_colected(route, G)
-        
+
     return route
 
 
-
-# def add_step(G, quota, alfa_grasp):    
+# def add_step(G, quota, alfa_grasp):
 #     route = [G.nodes[0]]
 
 #     bonus_colected = calculate_bonus_colected(route, G)
@@ -361,70 +625,72 @@ def drop_step(route, quota, G):
 #         economy_list = []
 #         for k in range(len(G.nodes)):
 #             if G.nodes[k] not in route:
-#                 if(len(route) == 1):
+#                 if (len(route) == 1):
 #                     route.insert(1, G.nodes[k])
 #                     continue
 #                 for r in range(len(route)):
 #                     i = route[r-1]['id']
 #                     j = route[r]['id']
-#                     edge = G.edges[i,j]
-#                     k_edge1 = G.edges[i,k]
-#                     k_edge2 = G.edges[k,j]
-#                     k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - k_edge1['weight'] - k_edge2['weight']
-#                     economy_list.append((k,k_economy_value,r))
-#         if(len(economy_list) == 0):
-#             continue 
-#         economy_list.sort(key=lambda item: item[1],reverse=True)
+#                     edge = G.edges[i, j]
+#                     k_edge1 = G.edges[i, k]
+#                     k_edge2 = G.edges[k, j]
+#                     k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - \
+#                         k_edge1['weight'] - k_edge2['weight']
+#                     economy_list.append((k, k_economy_value, r))
+#         if (len(economy_list) == 0):
+#             continue
+#         economy_list.sort(key=lambda item: item[1], reverse=True)
 #         best_economy = economy_list[0][1]
 #         worst_economy = economy_list[-1][1]
 #         grasp_tsh = best_economy - alfa_grasp * (best_economy - worst_economy)
-#         grasp_candidates = list(filter(lambda item: item[1] >= grasp_tsh, economy_list))
+#         grasp_candidates = list(
+#             filter(lambda item: item[1] >= grasp_tsh, economy_list))
 #         insertion_selected = random.choice(grasp_candidates)
-#         if(best_economy > 0 or bonus_colected < quota):
+#         if (best_economy > 0 or bonus_colected < quota):
 #             route.insert(insertion_selected[2], G.nodes[insertion_selected[0]])
 #         bonus_colected = calculate_bonus_colected(route, G)
 #     return route
 
 
-
 def grasp_construction(G, quota, alfa_grasp):
-    
-    route = [G.nodes[0]]
+
+    nodes = list(filter(lambda item: item != 0, G.nodes))
+
+    random_node = random.choice(nodes)
+
+    route = [G.nodes[0], G.nodes[random_node]]
 
     bonus_colected = calculate_bonus_colected(route, G)
     best_economy = -math.inf
 
-    # insert
     while bonus_colected < quota or best_economy > 0:
         best_economy = -math.inf
         economy_list = []
         for k in range(len(G.nodes)):
             if G.nodes[k] not in route:
-                route_len = len(route)
-                if(route_len == 1):
-                    route.append(G.nodes[k])
-                    continue
                 i = route[-2]['id']
                 j = route[-1]['id']
-                edge = G.edges[i,j]
-                k_edge1 = G.edges[i,k]
-                k_edge2 = G.edges[k,j]
-                k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - k_edge1['weight'] - k_edge2['weight']
-                economy_list.append((k,k_economy_value))
-                   
-        if(len(economy_list) == 0):
-            continue 
-        economy_list.sort(key=lambda item: item[1],reverse=True)
+                edge = G.edges[i, j]
+                k_edge1 = G.edges[i, k]
+                k_edge2 = G.edges[k, j]
+                k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - \
+                    k_edge1['weight'] - k_edge2['weight']
+                economy_list.append((k, k_economy_value))
+
+        if (len(economy_list) == 0):
+            continue
+        economy_list.sort(key=lambda item: item[1], reverse=True)
         best_economy = economy_list[0][1]
         worst_economy = economy_list[-1][1]
         grasp_tsh = best_economy - alfa_grasp * (best_economy - worst_economy)
-        grasp_candidates = list(filter(lambda item: item[1] >= grasp_tsh, economy_list))
+        grasp_candidates = list(
+            filter(lambda item: item[1] >= grasp_tsh, economy_list))
         insertion_selected = random.choice(grasp_candidates)
-        if(best_economy > 0 or bonus_colected < quota):
-            route.append(G.nodes[insertion_selected[0]])
+        if (best_economy > 0 or bonus_colected < quota):
+            route.insert(len(route) - 1, G.nodes[insertion_selected[0]])
         bonus_colected = calculate_bonus_colected(route, G)
-    return route
 
+    return route
 
 
 # memetico
@@ -454,7 +720,6 @@ def grasp_construction(G, quota, alfa_grasp):
 # 17 : devolver Mejor (pop, I)
 
 
-
 # OTHER ALGORITHMS
 
 # Algoritmo GRASP + VNS.
@@ -473,26 +738,29 @@ def grasp_vns(G, quota):
         for k in range(len(G.nodes)):
             if G.nodes[k] not in route:
                 route_len = len(route)
-                if(route_len == 1):
+                if (route_len == 1):
                     route.append(G.nodes[k])
                     continue
                 i = route[-2]['id']
                 j = route[-1]['id']
-                edge = G.edges[i,j]
-                k_edge1 = G.edges[i,k]
-                k_edge2 = G.edges[k,j]
-                k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - k_edge1['weight'] - k_edge2['weight']
-                economy_list.append((k,k_economy_value))
+                edge = G.edges[i, j]
+                k_edge1 = G.edges[i, k]
+                k_edge2 = G.edges[k, j]
+                k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - \
+                    k_edge1['weight'] - k_edge2['weight']
+                economy_list.append((k, k_economy_value))
         has_positive_economy = any(economy > 0 for economy in economy_list)
 
-        while(bonus_colected < quota or has_positive_economy):
-            economy_list.sort(key=lambda item: item[1],reverse=True)
+        while (bonus_colected < quota or has_positive_economy):
+            economy_list.sort(key=lambda item: item[1], reverse=True)
             best_economy = economy_list[0][1]
             worst_economy = economy_list[-1][1]
-            grasp_tsh = best_economy - alfa_grasp * (best_economy - worst_economy)
-            grasp_candidates = list(filter(lambda item: item[1] >= grasp_tsh, economy_list))
+            grasp_tsh = best_economy - alfa_grasp * \
+                (best_economy - worst_economy)
+            grasp_candidates = list(
+                filter(lambda item: item[1] >= grasp_tsh, economy_list))
             insertion_selected = random.choice(grasp_candidates)
-            if(best_economy > 0 or bonus_colected < quota):
+            if (best_economy > 0 or bonus_colected < quota):
                 route.append(G.nodes[insertion_selected[0]])
                 economy_list.remove(insertion_selected)
             # TODO: Analisar se precisa recaul
@@ -500,67 +768,48 @@ def grasp_vns(G, quota):
             has_positive_economy = any(economy > 0 for economy in economy_list)
 
         cost = route_cost(route, G)
-        if(cost < best_cost):
+        if (cost < best_cost):
             best_cost = cost
             best_route = route
     route = best_route
 
     # VNS
-    no_improvement_time = 0
-    neighboors = [neighboor_1(route, G), 
-                  neighboor_2(route, G), 
-                  neighboor_3(route), 
-                  neighboor_4(route), 
-                  neighboor_5(route, G)]
-    neighboors_len = len(neighboors)
-    while(no_improvement_time < max_time):
-        init_time = time.perf_counter()
-        choosen = random.choice(neighboors)
-
-        # VND
-        vnd_route = vnd(choosen)
-        
-        vnd_cost = route_cost(route, G)
-        
-        if(vnd_cost < best_cost):
-            best_cost = vnd_cost
-            best_route = vnd_route
-
-        current_time = time.perf_counter()
-        no_improvement_time = current_time - init_time
+    best_route = vns(route, G)
 
 
-    # Busca Local
-
-
-def vns(route, G):    
+def vns_vnd(route, quota, G):
     max_time = 200
-    
+    # print('AAA')
+
+    best_route = route
+    best_cost = route_cost(best_route, G)
+
     no_improvement_time = 0
-    neighboors = [neighboor_1(route, G), 
-                  neighboor_2(route, G), 
-                  neighboor_3(route, G), 
-                  neighboor_4(route, G), 
-                  neighboor_5(route, G)]
+    neighboors = [neighboor_1,
+                  neighboor_2,
+                  neighboor_3,
+                  neighboor_4,
+                  neighboor_5]
     neighboors_len = len(neighboors)
 
-    while(no_improvement_time < max_time):
+    while (no_improvement_time < max_time):
         init_time = time.perf_counter()
         k = 0
 
-        while(k < neighboors_len):
+        while (k < neighboors_len):
             choosen_function = neighboors[k]
 
             neighboor = choosen_function(route, G)
 
             # VND
-            vnd_route = vnd(neighboor)
-            
-            vnd_cost = route_cost(route, G)
-            
-            if(vnd_cost < best_cost):
+            vnd_route = vnd(neighboor, quota, G)
+
+            vnd_cost = route_cost(vnd_route, G)
+
+            if (vnd_cost < best_cost):
                 best_cost = vnd_cost
                 best_route = vnd_route
+                k = 0
             else:
                 k += 1
 
@@ -569,72 +818,121 @@ def vns(route, G):
 
         return best_route
 
-# TODO:
-def vnd(route): 
+
+def vnd(route, quota, G):
+    max_time = 200
+
+    # print('BBB')
+
+    best_route = route
+    best_cost = route_cost(best_route, G)
+
+    no_improvement_time = 0
+    refinements = [ls.seq_drop_seq_add,
+                   ls.swap_2_opt,
+                   ls.add_drop]
+    refinements_len = len(refinements)
+
+    while (no_improvement_time < max_time):
+        init_time = time.perf_counter()
+        k = 0
+
+        while (k < refinements_len):
+            choosen_function = refinements[k]
+
+            refined_route = choosen_function(route, quota, G)
+
+            refined_cost = route_cost(refined_route, G)
+
+            if (refined_cost < best_cost):
+                best_cost = refined_cost
+                best_route = refined_route
+                k = 0
+            else:
+                k += 1
+
+            current_time = time.perf_counter()
+            no_improvement_time = current_time - init_time
+
+        return best_route
+
     return route
 
-# Retirar vértice de maior economia:
+
 def neighboor_1(route, G):
     economy_list = []
     for r in range(len(route) - 1):
         i = route[r-1]['id']
         j = route[r]['id']
         s = route[r+1]['id']
-        k_edge1 = G.edges[i,j]
-        k_edge2 = G.edges[j,s]
-        edge = G.edges[i,s]
-        k_economy_value = k_edge1['weight'] + k_edge2['weight'] - edge['weight'] - G.nodes[j]['penalty']
-        economy_list.append((j,k_economy_value))
+        k_edge1 = G.edges[i, j]
+        k_edge2 = G.edges[j, s]
+        edge = G.edges[i, s]
+        k_economy_value = k_edge1['weight'] + k_edge2['weight'] - \
+            edge['weight'] - G.nodes[j]['penalty']
+        economy_list.append((j, k_economy_value))
 
-    economy_list.sort(key=lambda item: item[1],reverse=True)
+    economy_list.sort(key=lambda item: item[1], reverse=True)
     best_economy_item = economy_list[0]
-    route.remove(G.nodes[best_economy_item[0]])        
+    route.remove(G.nodes[best_economy_item[0]])
     return route
 
 # Inserir vértice de maior economia:
+
+
 def neighboor_2(route, G):
+    print('neighboor_2')
     economy_list = []
     for r in range(len(route) - 1):
         i = route[r-1]['id']
         j = route[r]['id']
         s = route[r+1]['id']
-        k_edge1 = G.edges[i,j]
-        k_edge2 = G.edges[j,s]
-        edge = G.edges[i,s]
-        k_economy_value = k_edge1['weight'] + k_edge2['weight'] - edge['weight'] - G.nodes[j]['penalty']
-        economy_list.append((j,k_economy_value,r))
+        k_edge1 = G.edges[i, j]
+        k_edge2 = G.edges[j, s]
+        edge = G.edges[i, s]
+        k_economy_value = k_edge1['weight'] + k_edge2['weight'] - \
+            edge['weight'] - G.nodes[j]['penalty']
+        economy_list.append((j, k_economy_value, r))
 
-    economy_list.sort(key=lambda item: item[1],reverse=True)
+    economy_list.sort(key=lambda item: item[1], reverse=True)
     best_economy_item = economy_list[0]
-    route.insert(best_economy_item[2],G.nodes[best_economy_item[0]])        
-    
+    route.insert(best_economy_item[2], G.nodes[best_economy_item[0]])
+
     return route
 
 # Troca dois vertices:
+
+
 def neighboor_3(route, G):
-    first, second = random.sample(range(1,len(route)), 2)
- 
+    print('neighboor_3')
+    first, second = random.sample(range(1, len(route)), 2)
+
     i = min(first, second)
     j = max(first, second)
-    route = swap_2(i, j, route)     
-      
+    route = swap_2(i, j, route)
+
     return route
 
 # Remove vertice aleatorio:
+
+
 def neighboor_4(route, G):
-    random_i = random.randrange(0, len(route))
+    print('neighboor_4')
+    random_i = random.randrange(1, len(route))
 
     del route[random_i]
-      
+
     return route
 
 # Insere vertice aleatorio:
+
+
 def neighboor_5(route, G):
     random_node_i = random.randrange(0, len(G.nodes))
-    while(random_node_i in route):
+    while (random_node_i in route):
         random_node_i = random.randrange(0, len(G.nodes))
     random_i = random.randrange(0, len(route))
 
     route.insert(random_i, random_node_i)
-      
+
     return route

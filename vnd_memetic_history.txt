@@ -1,0 +1,1 @@
+iteration;duration(s);cost;route

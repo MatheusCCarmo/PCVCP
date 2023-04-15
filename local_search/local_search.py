@@ -4,30 +4,44 @@ from aux_functions import *
 import math
 
 
-
-def swap_2_opt(route, G):
+def swap_2_opt(route, quota, G):
     cur_cost = route_cost(route, G)
 
     improved = True
 
-    # TODO: adicionar um critério de parada para evitar uma busca muito extensiva numa mesma vizinhança
     while improved:
+        counter = 0
         improved = False
         routeLen = len(route)
-        for i in range(1,routeLen):
-            for j in range(i+1,routeLen):
-                
-                
-                new_route = swap_2(i,j, route)
+        for i in range(1, routeLen):
+            for j in range(i+1, routeLen):
+
+                new_route = swap_2(i, j, route)
                 new_cost = route_cost(new_route, G)
-                
+
                 # update the route, if improved
                 if new_cost < cur_cost:
                     cur_cost = new_cost
                     route = new_route
                     improved = True
+                    counter = 0
+
+                counter += 1
+                if counter > 100000:
+                    break
     return route
 
+
+def add_drop(route, quota, G):
+    route = add_step(route, quota, G)
+    route = drop_step(route, quota, G)
+    return route
+
+
+def seq_drop_seq_add(route, quota, G):
+    route = drop_step(route, quota, G)
+    route = add_step(route, quota, G)
+    return route
 
 
 def drop_step(route, quota, G):
@@ -35,7 +49,7 @@ def drop_step(route, quota, G):
     best_economy = -math.inf
 
     improved = True
-    
+
     # insert
     while improved:
         best_economy = -math.inf
@@ -44,29 +58,29 @@ def drop_step(route, quota, G):
             i = route[r-1]['id']
             j = route[r]['id']
             s = route[r+1]['id']
-            k_edge1 = G.edges[i,j]
-            k_edge2 = G.edges[j,s]
-            edge = G.edges[i,s]
-            k_economy_value = k_edge1['weight'] + k_edge2['weight'] - edge['weight'] - G.nodes[j]['penalty']
-            economy_list.append((j,k_economy_value,r))
-        if(len(economy_list) == 0):
-            continue 
-        economy_list.sort(key=lambda item: item[1],reverse=True)
+            k_edge1 = G.edges[i, j]
+            k_edge2 = G.edges[j, s]
+            edge = G.edges[i, s]
+            k_economy_value = k_edge1['weight'] + k_edge2['weight'] - \
+                edge['weight'] - G.nodes[j]['penalty']
+            economy_list.append((j, k_economy_value, r))
+        if (len(economy_list) == 0):
+            continue
+        economy_list.sort(key=lambda item: item[1], reverse=True)
         best_economy_item = economy_list[0]
         best_economy = best_economy_item[1]
         item_bonus = G.nodes[best_economy_item[0]]['bonus']
-        if(best_economy > 0 and (bonus_colected - item_bonus) > quota):
+        if (best_economy > 0 and (bonus_colected - item_bonus) > quota):
             route.remove(G.nodes[best_economy_item[0]])
             improved = True
         else:
             improved = False
         bonus_colected = calculate_bonus_colected(route, G)
-        
+
     return route
 
-def add_step(G, quota, route):
-    route = [G.nodes[0]]
 
+def add_step(route, quota, G):
     bonus_colected = calculate_bonus_colected(route, G)
     k_best_economy_value = -math.inf
 
@@ -79,17 +93,18 @@ def add_step(G, quota, route):
                 for r in range(len(route)):
                     i = route[r-1]['id']
                     j = route[r]['id']
-                    edge = G.edges[i,j]
-                    k_edge1 = G.edges[i,k]
-                    k_edge2 = G.edges[k,j]
-                    k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - k_edge1['weight'] - k_edge2['weight']
+                    edge = G.edges[i, j]
+                    k_edge1 = G.edges[i, k]
+                    k_edge2 = G.edges[k, j]
+                    k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - \
+                        k_edge1['weight'] - k_edge2['weight']
 
                     if k_economy_value > k_best_economy_value:
                         k_best_economy_value = k_economy_value
                         k_best_economy = k
-                        r_best_economy = r        
-        
-        if(k_best_economy_value > 0 or bonus_colected < quota):
+                        r_best_economy = r
+
+        if (k_best_economy_value > 0 or bonus_colected < quota):
             route.insert(r_best_economy, G.nodes[k_best_economy])
         bonus_colected = calculate_bonus_colected(route, G)
     return route
@@ -131,7 +146,7 @@ def add_step(G, quota, route):
 #     [(a,b), (b,c), (c,d), (d,e), (e,c)]
 #     new_route = [*delta[:len(delta) -1], delta[i]]
 #     return route_lin
-    
+
 
 # def best_from(delta, route, G):
 #     print(delta)
@@ -163,6 +178,6 @@ def add_step(G, quota, route):
 #     distance_cost = 0
 #     for v in range(len(route_lin) - 1):
 #         i = route_lin[v]['id']
-#         j = route_lin[v + 1]['id']        
+#         j = route_lin[v + 1]['id']
 #         distance_cost += G.edges[i,j]['weight']
 #     return distance_cost
