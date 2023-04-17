@@ -15,6 +15,7 @@ def swap_2(i, j, route):
     route_B = route[i:j]
     route_B.reverse()
     new_route = [*route_A, *route_B, *route[j:]]
+    # new_route = route[:i+1] + list(reversed(route[i+1:j+1])) + route[j+1:]
     return new_route
 
 
@@ -121,7 +122,8 @@ def load_other_dataset(file_name):
                 is_prize = False
 
             if (is_penalty):
-                node_penalties = list(map(lambda penalty: int(penalty), new_line))
+                node_penalties = list(
+                    map(lambda penalty: int(penalty), new_line))
                 is_penalty = False
 
             if (new_line[0] == "PRIZE"):
@@ -146,7 +148,7 @@ def load_other_dataset(file_name):
                     continue
                 else:
                     is_coord = False
-            
+
             quota = sum(node_prizes) * 0.75
 
     return node_prizes, node_penalties, matrix, quota

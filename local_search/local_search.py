@@ -2,6 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from aux_functions import *
 import math
+import time
 
 
 def swap_2_opt(route, quota, G):
@@ -9,26 +10,34 @@ def swap_2_opt(route, quota, G):
 
     improved = True
 
+    routeLen = len(route)
+    no_improvement_count = routeLen * 100
+
     while improved:
         counter = 0
         improved = False
-        routeLen = len(route)
         for i in range(1, routeLen):
-            for j in range(i+1, routeLen):
-
+            for j in range(i+2, routeLen + 1):
+                # print('i,j', i, j)
+                # print('route length', routeLen)
+                # tic_swap_2 = time.perf_counter()
                 new_route = swap_2(i, j, route)
+                # tac_swap_2 = time.perf_counter()
+                # print('swap_2 - ', tac_swap_2 - tic_swap_2)
+
                 new_cost = route_cost(new_route, G)
 
                 # update the route, if improved
                 if new_cost < cur_cost:
                     cur_cost = new_cost
                     route = new_route
+                    routeLen = len(route)
                     improved = True
                     counter = 0
 
-                counter += 1
-                if counter > 100000:
+                if counter > no_improvement_count:
                     break
+                counter += 1
     return route
 
 
