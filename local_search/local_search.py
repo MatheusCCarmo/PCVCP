@@ -38,18 +38,24 @@ def swap_2_opt(route, quota, G):
                 if counter > no_improvement_count:
                     break
                 counter += 1
+    # print('swap_2_opt')
+    # print(route)
     return route
 
 
 def add_drop(route, quota, G):
     route = add_step(route, quota, G)
     route = drop_step(route, quota, G)
+    # print('add_drop')
+    # print(route)
     return route
 
 
 def seq_drop_seq_add(route, quota, G):
     route = drop_step(route, quota, G)
     route = add_step(route, quota, G)
+    # print('seq_drop_seq_add')
+    # print(route)
     return route
 
 
@@ -99,7 +105,7 @@ def add_step(route, quota, G):
         k_best_economy = 0
         for k in range(len(G.nodes)):
             if G.nodes[k] not in route:
-                for r in range(len(route)):
+                for r in range(1, len(route)):
                     i = route[r-1]['id']
                     j = route[r]['id']
                     edge = G.edges[i, j]
@@ -114,7 +120,10 @@ def add_step(route, quota, G):
                         r_best_economy = r
 
         if (k_best_economy_value > 0 or bonus_colected < quota):
-            route.insert(r_best_economy, G.nodes[k_best_economy])
+            if (r_best_economy == 0):
+                route.append(G.nodes[k_best_economy])
+            else:
+                route.insert(r_best_economy, G.nodes[k_best_economy])
         bonus_colected = calculate_bonus_colected(route, G)
     return route
 

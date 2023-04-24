@@ -114,13 +114,21 @@ import time
 # ALGORITTMOS
 
 population_size = 100
-mutation_rate = 0.2
-recombination_rate = 0.2
+mutation_rate = 0.1
+recombination_rate = 0.1
 
 million = 1000000
 
 
 def memetic_algorithm(G, quota):
+    local_total = 0
+    parents_total = 0
+    recombination_total = 0
+    mutation_total = 0
+    local_mutation_total = 0
+    count_local_mutation = 0
+    count_local = 0
+
     tic = time.perf_counter()
     population = init_population(G, quota)
     tac = time.perf_counter()
@@ -132,70 +140,75 @@ def memetic_algorithm(G, quota):
         children = []
 
         # para cada i de 1 até N (onde N é o tamanho da população) faça:
-        # tic_loop = time.perf_counter()
-        print('route_cost.counter')
-        print(route_cost.counter)
+        tic_loop = time.perf_counter()
+        # print('route_cost.counter')
+        # print(route_cost.counter)
         for i in range(population_size):
 
             # sorteie os pais. Aplique operadores (recombination, mutation).
-            # tic_parents = time.perf_counter()
+            tic_parents = time.perf_counter()
             parent_1 = parents_selection(population, 4)
             parent_2 = parents_selection(population, 4)
-            # tac_parents = time.perf_counter()
+            tac_parents = time.perf_counter()
             # print('parents_selection', tac_parents - tic_parents)
+            parents_total += (tac_parents - tic_parents)
 
             # aplicar recombinação
             rand = random.random()
             if (rand < recombination_rate):
-                # tic_recombination = time.perf_counter()
+                tic_recombination = time.perf_counter()
                 child_1, child_2 = recombination(parent_1, parent_2, G)
                 children.append(child_1)
                 children.append(child_2)
-                # tac_recombination = time.perf_counter()
+                tac_recombination = time.perf_counter()
                 # print('recombination - ', tac_recombination - tic_recombination)
+                recombination_total += (tac_recombination - tic_recombination)
 
             # aplicar mutação
             if (rand < mutation_rate):
-                # tic_mutation = time.perf_counter()
+                tic_mutation = time.perf_counter()
                 mutated = mutation(population, G)
-                # tac_mutation = time.perf_counter()
+                tac_mutation = time.perf_counter()
                 # print('mutation - ', tac_mutation - tic_mutation)
+                mutation_total += (tac_mutation - tic_mutation)
 
                 # busca local do resultante da mutação
+                tic_mut_local = time.perf_counter()
                 new_mutated = local_search(mutated, quota, G)
-                # tac_mut_local = time.perf_counter()
-                # print('local mutation - ', tac_mut_local - tac_mutation)
+                tac_mut_local = time.perf_counter()
+                # print('local mutation - ', tac_mut_local - tic_mut_local)
+                local_mutation_total += (tac_mut_local - tic_mut_local)
+                count_local_mutation += 1
 
                 children.append(new_mutated)
-        # tac_loop = time.perf_counter()
-        # print('begin for loop - ', tac_loop - tic_loop)
+            # break
+        tac_loop = time.perf_counter()
+        # print('for loop - ', tac_loop - tic_loop)
 
         # busca local de alguns filhos gerados
-        # tic_search_1 = time.perf_counter()
+        tic_search_1 = time.perf_counter()
         random_children = random.choices(population, k=3)
         new_child_1 = local_search(random_children[0], quota, G)
-        # tac_search_1 = time.perf_counter()
+        tac_search_1 = time.perf_counter()
         # print('local_1 - ', tac_search_1 - tic_search_1)
+        local_total += (tac_search_1 - tic_search_1)
+        count_local += 1
 
-        # tic_search_2 = time.perf_counter()
+        tic_search_2 = time.perf_counter()
         random_children = random.choices(population, k=3)
         new_child_2 = local_search(random_children[1], quota, G)
-        # tac_search_2 = time.perf_counter()
+        tac_search_2 = time.perf_counter()
         # print('local_2 - ', tac_search_2 - tic_search_2)
+        local_total += (tac_search_2 - tic_search_2)
+        count_local += 1
 
-        # tic_search_3 = time.perf_counter()
+        tic_search_3 = time.perf_counter()
         random_children = random.choices(population, k=3)
         new_child_3 = local_search(random_children[2], quota, G)
-        # tac_search_3 = time.perf_counter()
+        tac_search_3 = time.perf_counter()
         # print('local_3 - ', tac_search_3 - tic_search_3)
-
-        # tic = time.perf_counter()
-        # print('local_search_2 - ', tic)
-        # new_child_2 = local_search(random_children[1], quota, G)
-
-        # tic = time.perf_counter()
-        # print('local_search_3 - ', tic)
-        # new_child_3 = local_search(random_children[2], quota, G)
+        local_total += (tac_search_3 - tic_search_3)
+        count_local += 1
 
         children.append(new_child_1)
         children.append(new_child_2)
@@ -203,13 +216,13 @@ def memetic_algorithm(G, quota):
 
         new_population = [*population, *children]
 
-        # tic_new = time.perf_counter()
+        tic_new = time.perf_counter()
         new_population.sort(
             key=lambda item: item.fitness_value(), reverse=True)
-        # tac_new = time.perf_counter()
+        tac_new = time.perf_counter()
         # print('new population - ', tac_new - tic_new)
-
         population = new_population[:population_size]
+        # break
 
     tac_while = time.perf_counter()
     print('while loop - ', tac_while - tic_while)
@@ -218,6 +231,14 @@ def memetic_algorithm(G, quota):
     print('best_genetic_solution')
     best = best_genetic_solution(population)
     route_cost.counter = 0
+
+    print('local_total - ', local_total)
+    print('parents_total - ', parents_total)
+    print('recombination_total - ', recombination_total)
+    print('mutation_total - ', mutation_total)
+    print('local_mutation_total - ', local_mutation_total)
+    print('count_local - ', count_local)
+    print('count_local_mutation - ', count_local_mutation)
 
     return best
 
@@ -287,8 +308,9 @@ def vns_memetic_algorithm(G, quota):
 
     # enquanto critério de parada não for satisfeito faça:
     while (route_cost.counter < million):
-
         children = []
+        # print('route_cost.counter', route_cost.counter)
+
         # para cada i de 1 até N (onde N é o tamanho da população) faça:
         for i in range(population_size):
 
@@ -493,11 +515,11 @@ def reactive_grasp_algorithm(G, quota):
         k_itr = 100
         k = k_itr
 
-        print('route_cost.counter')
-        print(route_cost.counter)
+        # print('route_cost.counter')
+        # print(route_cost.counter)
 
-        print('weights')
-        print(weights)
+        # print('weights')
+        # print(weights)
 
         for i in range(iterations):
             alfa_grasp = random.choices(alfas, weights=weights, k=1)[0]
@@ -632,6 +654,7 @@ def parents_selection(population, k):
 
 
 def recombination(parent_1, parent_2, G):
+
     child_1, child_2 = crossover_two(parent_1, parent_2)
 
     chromo_1 = Chromo(child_1, G)
@@ -855,34 +878,40 @@ def grasp_construction(G, quota, alfa_grasp):
 
 # OTHER ALGORITHMS
 
-# Algoritmo GRASP + VNS.
-def grasp_vns(G, quota):
+# Algoritmo GRASP + VNS + VND.
+def grasp_vns_vnd(G, quota):
     max_iter = 4000
     alfa_grasp = 0.2
 
     # Construção
     route = [G.nodes[0]]
     best_route = route
+    best_cost = math.inf
     bonus_colected = calculate_bonus_colected(route, G)
 
     for n in range(max_iter):
         best_economy = -math.inf
         economy_list = []
         for k in range(len(G.nodes)):
+            # print('economy_list')
+            # print(economy_list)
             if G.nodes[k] not in route:
                 route_len = len(route)
                 if (route_len == 1):
-                    route.append(G.nodes[k])
-                    continue
-                i = route[-2]['id']
-                j = route[-1]['id']
-                edge = G.edges[i, j]
-                k_edge1 = G.edges[i, k]
-                k_edge2 = G.edges[k, j]
-                k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - \
-                    k_edge1['weight'] - k_edge2['weight']
+                    i = route[0]['id']
+                    edge = G.edges[0, k]
+                    k_economy_value = G.nodes[k]['penalty'] - edge['weight']
+                else:
+                    i = route[-2]['id']
+                    j = route[-1]['id']
+                    edge = G.edges[i, j]
+                    k_edge1 = G.edges[i, k]
+                    k_edge2 = G.edges[k, j]
+                    k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - \
+                        k_edge1['weight'] - k_edge2['weight']
                 economy_list.append((k, k_economy_value))
-        has_positive_economy = any(economy > 0 for economy in economy_list)
+
+        has_positive_economy = any(economy[1] > 0 for economy in economy_list)
 
         while (bonus_colected < quota or has_positive_economy):
             economy_list.sort(key=lambda item: item[1], reverse=True)
@@ -898,7 +927,8 @@ def grasp_vns(G, quota):
                 economy_list.remove(insertion_selected)
             # TODO: Analisar se precisa recaul
             bonus_colected = calculate_bonus_colected(route, G)
-            has_positive_economy = any(economy > 0 for economy in economy_list)
+            has_positive_economy = any(
+                economy[1] > 0 for economy in economy_list)
 
         cost = route_cost(route, G)
         if (cost < best_cost):
@@ -906,8 +936,14 @@ def grasp_vns(G, quota):
             best_route = route
     route = best_route
 
-    # VNS
-    best_route = vns(route, G)
+    print('route pre vndvns', best_cost)
+
+    # VNS + VND
+    best_route = vns_vnd(route, quota, G)
+
+    print('route pos vndvns', route_cost(best_route, G))
+
+    return best_route
 
 
 def vns(route, quota, G):
@@ -933,10 +969,6 @@ def vns(route, quota, G):
 
             neighboor = choosen_function(best_route, G)
 
-            print('neighboor', k)
-            print(best_route)
-            print(neighboor)
-
             bonus_colected = calculate_bonus_colected(neighboor, G)
 
             if (bonus_colected >= quota):
@@ -945,7 +977,6 @@ def vns(route, quota, G):
                 new_cost = route_cost(new_route, G)
 
                 if (new_cost < best_cost):
-                    print('BEST')
                     best_cost = new_cost
                     best_route = new_route
                     k = 0
@@ -958,11 +989,11 @@ def vns(route, quota, G):
             no_improvement_time = current_time - init_time
 
         return best_route
+    return best_route
 
 
 def vns_vnd(route, quota, G):
     max_time = 200
-    # print('AAA')
 
     best_route = route
     best_cost = route_cost(best_route, G)
@@ -982,7 +1013,9 @@ def vns_vnd(route, quota, G):
         while (k < neighboors_len):
             choosen_function = neighboors[k]
 
-            neighboor = choosen_function(route, G)
+            neighboor = choosen_function(best_route, G)
+
+            bonus_colected = calculate_bonus_colected(neighboor, G)
 
             # VND
             vnd_route = vnd(neighboor, quota, G)
@@ -998,8 +1031,8 @@ def vns_vnd(route, quota, G):
 
             current_time = time.perf_counter()
             no_improvement_time = current_time - init_time
-
         return best_route
+    return best_route
 
 
 def vnd(route, quota, G):
@@ -1043,8 +1076,8 @@ def vnd(route, quota, G):
 
 
 def neighboor_1(route, G):
+    # print('neighboor_1')
     economy_list = []
-    print(len(route))
     for r in range(len(route) - 1):
         i = route[r-1]['id']
         j = route[r]['id']
@@ -1060,65 +1093,77 @@ def neighboor_1(route, G):
     economy_list.sort(key=lambda item: item[1], reverse=True)
     best_economy_item = economy_list[0]
     route.remove(G.nodes[best_economy_item[0]])
+    # print(route)
     return route
 
 # Inserir vértice de maior economia:
 
 
 def neighboor_2(route, G):
-    print('neighboor_2')
+    # print('neighboor_2')
+
+    best_economy = -math.inf
+
+    # insert
+    best_economy = -math.inf
     economy_list = []
-    for r in range(len(route) - 1):
-        i = route[r-1]['id']
-        j = route[r]['id']
-        s = route[r+1]['id']
-        print('i,j,s', i, j, s)
-        k_edge1 = G.edges[i, j]
-        k_edge2 = G.edges[j, s]
-        edge = G.edges[i, s]
-        k_economy_value = edge['weight'] + G.nodes[j]['penalty'] - \
-            k_edge1['weight'] - k_edge2['weight']
-        economy_list.append((j, k_economy_value, r))
-
+    for k in range(len(G.nodes)):
+        if G.nodes[k] not in route:
+            for r in range(1, len(route)):
+                i = route[r-1]['id']
+                j = route[r]['id']
+                edge = G.edges[i, j]
+                k_edge1 = G.edges[i, k]
+                k_edge2 = G.edges[k, j]
+                k_economy_value = edge['weight'] + G.nodes[k]['penalty'] - \
+                    k_edge1['weight'] - k_edge2['weight']
+                economy_list.append((k, k_economy_value, r))
     economy_list.sort(key=lambda item: item[1], reverse=True)
-    best_economy_item = economy_list[0]
-    route.insert(best_economy_item[2], G.nodes[best_economy_item[0]])
+    best_economy = economy_list[0]
+    if (best_economy[2] == 0):
+        route.append(G.nodes[best_economy[0]])
+    else:
+        route.insert(best_economy[2], G.nodes[best_economy[0]])
 
+    # print(route)
     return route
+
 
 # Troca dois vertices:
 
 
 def neighboor_3(route, G):
-    print('neighboor_3')
+    # print('neighboor_3')
     first, second = random.sample(range(1, len(route)), 2)
 
     i = min(first, second)
     j = max(first, second)
     route = swap_2(i, j, route)
-
+    # print(route)
     return route
 
 # Remove vertice aleatorio:
 
 
 def neighboor_4(route, G):
-    print('neighboor_4')
+    # print('neighboor_4')
     random_i = random.randrange(1, len(route))
 
     del route[random_i]
 
+    # print(route)
     return route
 
 # Insere vertice aleatorio:
 
 
 def neighboor_5(route, G):
-    random_node_i = random.randrange(0, len(G.nodes))
-    while (random_node_i in route):
-        random_node_i = random.randrange(0, len(G.nodes))
-    random_i = random.randrange(0, len(route))
+    # print('neighboor_5')
+    random_node = random.choice(G.nodes)
+    while (random_node in route):
+        random_node = random.choice(G.nodes)
+    random_i = random.randrange(1, len(route))
 
-    route.insert(random_i, random_node_i)
-
+    route.insert(random_i, random_node)
+    # print(route)
     return route
