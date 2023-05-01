@@ -125,8 +125,8 @@ def test_algorithm(G, quota):
     population = init_population(G, quota)
     route = population[0].route
 
-    # while (route_cost.counter < million):
-    for i in range(million):
+    while (route_cost.counter < million):
+
         # print(route_cost.counter)
         route_cost(route, G)
 
@@ -753,14 +753,25 @@ def best_genetic_solution(population):
     return best_chromo.route
 
 
+# def generate_random_route(G, quota):
+#     bonus_colected = 0
+#     route = [G.nodes[0]]
+#     while (bonus_colected < quota):
+#         random_i = random.randrange(0, len(G.nodes))
+#         if (G.nodes[random_i] not in route):
+#             bonus_colected += G.nodes[random_i]['bonus']
+#             route.append(G.nodes[random_i])
+
+#     return route
+
 def generate_random_route(G, quota):
     bonus_colected = 0
-    route = [G.nodes[0]]
+    route = [0]
     while (bonus_colected < quota):
         random_i = random.randrange(0, len(G.nodes))
-        if (G.nodes[random_i] not in route):
+        if (random_i not in route):
             bonus_colected += G.nodes[random_i]['bonus']
-            route.append(G.nodes[random_i])
+            route.append(random_i)
 
     return route
 

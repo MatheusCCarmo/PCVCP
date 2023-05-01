@@ -1,6 +1,7 @@
 import math
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 from entities.vertex import Vertex
 
 calculations_counter = 0
@@ -190,11 +191,42 @@ def load_other_dataset(file_name):
 #     return dataset
 
 
+# def route_cost(route, G):
+#     route_cost.counter += 1
+#     penalties = calculate_penalties(route, G)
+#     distance = calculate_route_distance(route, G)
+#     cost = penalties + distance
+
+#     return cost
+
 def route_cost(route, G):
     route_cost.counter += 1
-    penalties = calculate_penalties(route, G)
-    distance = calculate_route_distance(route, G)
-    cost = penalties + distance
+
+    route_edges = [(route[i-1], route[i])
+                   for i in range(len(route))]
+
+    num_nodes = len(G.nodes)
+
+    # Initialize the matrix with zeros
+    edges_incidence = np.zeros((num_nodes, num_nodes))
+
+    node_incidence = [
+        1 if i in route else 0 for i in range(len(G.nodes))]
+
+    # Set the entries in the matrix to 1 for the route edges
+    for edge in route_edges:
+        edges_incidence[edge[0], edge[1]] = 1
+
+    # xii = 1 - yi
+    for i in G.nodes:
+        edges_incidence[i, i] = 1 - node_incidence[i]
+
+    cost = 0
+
+    # obter as posições onde há valor 1
+    indices = np.where(edges_incidence == 1)
+    for i, j in zip(indices[0], indices[1]):
+        cost += G[i][j]['weight']
 
     return cost
 
