@@ -195,6 +195,7 @@ def route_cost(route, G):
     penalties = calculate_penalties(route, G)
     distance = calculate_route_distance(route, G)
     cost = penalties + distance
+
     return cost
 
 

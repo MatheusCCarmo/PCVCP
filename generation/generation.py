@@ -120,6 +120,42 @@ recombination_rate = 0.1
 million = 1000000
 
 
+def test_algorithm(G, quota):
+
+    population = init_population(G, quota)
+    route = population[0].route
+
+    # while (route_cost.counter < million):
+    for i in range(million):
+        # print(route_cost.counter)
+        route_cost(route, G)
+
+        # random_children = random.choices(new_population, k=3)
+        # new_child_1 = local_search(random_children[0], quota, G)
+
+        # random_children = random.choices(new_population, k=3)
+        # new_child_2 = local_search(random_children[1], quota, G)
+
+        # random_children = random.choices(new_population, k=3)
+        # new_child_3 = local_search(random_children[2], quota, G)
+
+        # random_children = random.choices(new_population, k=3)
+
+        # children.append(new_child_1)
+        # children.append(new_child_2)
+        # children.append(new_child_3)
+
+        # new_population = [*new_population, *children]
+
+        # new_population.sort(
+        #     key=lambda item: item.fitness_value(), reverse=True)
+        continue
+
+    best = route
+
+    return best
+
+
 def memetic_algorithm(G, quota):
     local_total = 0
     parents_total = 0
@@ -450,10 +486,7 @@ def genetic_algorithm(G, quota):
             rand = random.random()
             if (rand < mutation_rate):
                 mutated = mutation(population, G)
-                # busca local do resultante da mutação
-                new_mutated = local_search(mutated, quota, G)
-
-                children.append(new_mutated)
+                children.append(mutated)
 
         new_population = [*population, *children]
         new_population.sort(
