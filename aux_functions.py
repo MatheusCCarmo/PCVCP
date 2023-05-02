@@ -1,3 +1,4 @@
+import scipy.sparse as sp
 import math
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -21,21 +22,19 @@ def swap_2(i, j, route):
 
 
 def calculate_route_distance(route, G):
-
     distance = 0
-    # print(route)
     for v in range(len(route)):
-        i = route[v - 1]['id']
-        j = route[v]['id']
+        i = route[v - 1]
+        j = route[v]
         distance += G.edges[i, j]['weight']
+        
     return distance
 
 
 def calculate_penalties(route, G):
-
     penalties = 0
     for i in range(len(G.nodes)):
-        if G.nodes[i] not in route:
+        if i not in route:
             penalties += G.nodes[i]['penalty']
 
     return penalties
@@ -45,7 +44,7 @@ def calculate_bonus_colected(route, G):
 
     bonus = 0
     for r in route:
-        bonus += G.nodes[r['id']]['bonus']
+        bonus += G.nodes[r]['bonus']
 
     return bonus
 
@@ -53,7 +52,7 @@ def calculate_bonus_colected(route, G):
 def bonus_labels(route):
     bonus_label = {}
     for i in range(len(route)):
-        bonus_label[route[i]['id']] = route[i]['bonus']
+        bonus_label[route[i]] = route[i]['bonus']
     return bonus_label
 
 
@@ -191,44 +190,74 @@ def load_other_dataset(file_name):
 #     return dataset
 
 
+def route_cost(route, G):
+    route_cost.counter += 1
+    penalties = calculate_penalties(route, G)
+    distance = calculate_route_distance(route, G)
+    cost = penalties + distance
+
+    return cost
+
 # def route_cost(route, G):
 #     route_cost.counter += 1
-#     penalties = calculate_penalties(route, G)
-#     distance = calculate_route_distance(route, G)
-#     cost = penalties + distance
+
+#     route_edges = [(route[i-1], route[i])
+#                    for i in range(len(route))]
+
+#     num_nodes = len(G.nodes)
+
+#     # Initialize the matrix with zeros
+#     edges_incidence = np.zeros((num_nodes, num_nodes))
+
+#     node_incidence = [
+#         1 if i in route else 0 for i in range(len(G.nodes))]
+
+#     # Set the entries in the matrix to 1 for the route edges
+#     for edge in route_edges:
+#         edges_incidence[edge[0], edge[1]] = 1
+
+#     # xii = 1 - yi
+#     for i in G.nodes:
+#         edges_incidence[i, i] = 1 - node_incidence[i]
+
+#     cost = 0
+#     # obter as posições onde há valor 1
+#     indices = np.where(edges_incidence == 1)
+#     for i, j in zip(indices[0], indices[1]):
+#         cost += G[i][j]['weight']
 
 #     return cost
 
-def route_cost(route, G):
-    route_cost.counter += 1
 
-    route_edges = [(route[i-1], route[i])
-                   for i in range(len(route))]
+# def route_cost(edges_costs, edges_incidence):
+#     route_cost.counter += 1
 
-    num_nodes = len(G.nodes)
+#     route_edges = [(route[i-1], route[i])
+#                    for i in range(len(route))]
 
-    # Initialize the matrix with zeros
-    edges_incidence = np.zeros((num_nodes, num_nodes))
+#     num_nodes = len(G.nodes)
 
-    node_incidence = [
-        1 if i in route else 0 for i in range(len(G.nodes))]
+#     # Initialize the matrix with zeros
+#     edges_incidence = np.zeros((num_nodes, num_nodes))
 
-    # Set the entries in the matrix to 1 for the route edges
-    for edge in route_edges:
-        edges_incidence[edge[0], edge[1]] = 1
+#     node_incidence = [
+#         1 if i in route else 0 for i in range(len(G.nodes))]
 
-    # xii = 1 - yi
-    for i in G.nodes:
-        edges_incidence[i, i] = 1 - node_incidence[i]
+#     # Set the entries in the matrix to 1 for the route edges
+#     for edge in route_edges:
+#         edges_incidence[edge[0], edge[1]] = 1
 
-    cost = 0
+#     # xii = 1 - yi
+#     for i in G.nodes:
+#         edges_incidence[i, i] = 1 - node_incidence[i]
 
-    # obter as posições onde há valor 1
-    indices = np.where(edges_incidence == 1)
-    for i, j in zip(indices[0], indices[1]):
-        cost += G[i][j]['weight']
+#     cost = 0
+#     # obter as posições onde há valor 1
+#     indices = np.where(edges_incidence == 1)
 
-    return cost
+#     cost = edges_costs * edges_incidence
+
+#     return cost
 
 
 route_cost.counter = 0
@@ -244,6 +273,6 @@ def report(duration, route, G):
 
 def plot(route, G):
     plt.figure()
-    route_edges = [(route[i-1]['id'], route[i]['id'])
+    route_edges = [(route[i-1], route[i])
                    for i in range(len(route))]
     nx.draw(G.edge_subgraph(route_edges), with_labels=True)

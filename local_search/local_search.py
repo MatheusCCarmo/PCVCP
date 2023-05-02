@@ -70,9 +70,9 @@ def drop_step(route, quota, G):
         best_economy = -math.inf
         economy_list = []
         for r in range(len(route) - 1):
-            i = route[r-1]['id']
-            j = route[r]['id']
-            s = route[r+1]['id']
+            i = route[r-1]
+            j = route[r]
+            s = route[r+1]
             k_edge1 = G.edges[i, j]
             k_edge2 = G.edges[j, s]
             edge = G.edges[i, s]
@@ -106,8 +106,8 @@ def add_step(route, quota, G):
         for k in range(len(G.nodes)):
             if G.nodes[k] not in route:
                 for r in range(1, len(route)):
-                    i = route[r-1]['id']
-                    j = route[r]['id']
+                    i = route[r-1]
+                    j = route[r]
                     edge = G.edges[i, j]
                     k_edge1 = G.edges[i, k]
                     k_edge2 = G.edges[k, j]
@@ -133,15 +133,15 @@ def add_step(route, quota, G):
 
 #     best_route = route_lin
 #     for v1 in range(len(route) - 1):
-#         i = route_lin[v1]['id']
-#         j = route_lin[v1+1]['id']
+#         i = route_lin[v1]
+#         j = route_lin[v1+1]
 #         edge1 = (i,j)
 #         edge1_length = G.edges[i,j]['weight']
 #         minimum_edge_length = edge1_length
 #         minimum_edge = edge1
 #         for v2 in range(v1, len(route_lin) - 1):
-#             i = route_lin[v2]['id']
-#             j = route_lin[v2 + 1]['id']
+#             i = route_lin[v2]
+#             j = route_lin[v2 + 1]
 #             edge2 = (i,j)
 #             edge2_length = G.edges[i,j]['weight']
 #             if(edge2_length < minimum_edge_length):
@@ -195,7 +195,7 @@ def add_step(route, quota, G):
 # def calculate_lin_route_distance(route_lin, G):
 #     distance_cost = 0
 #     for v in range(len(route_lin) - 1):
-#         i = route_lin[v]['id']
-#         j = route_lin[v + 1]['id']
+#         i = route_lin[v]
+#         j = route_lin[v + 1]
 #         distance_cost += G.edges[i,j]['weight']
 #     return distance_cost

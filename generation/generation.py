@@ -111,6 +111,15 @@ import time
 # usar GUROBI
 
 
+# Lentidão
+# There are a few other things you can try:
+
+# Profile your code to identify bottlenecks: Use a profiling tool to identify the parts of your code that take the most time. Once you know where the problem lies, you can try to optimize that specific part.
+
+# Use Cython: Cython is a superset of Python that allows you to write C extensions for Python. By converting your Python code to Cython, you can achieve significant speedups.
+
+# Use Numba: Numba is a just-in-time compiler that allows you to speed up Python code by compiling it on the fly. It works by generating optimized machine code for your functions, and can be a good option for numerical computations.
+
 # ALGORITTMOS
 
 population_size = 100
@@ -126,6 +135,7 @@ def test_algorithm(G, quota):
     route = population[0].route
 
     while (route_cost.counter < million):
+    # for i in range(1):
 
         # print(route_cost.counter)
         route_cost(route, G)
@@ -149,10 +159,10 @@ def test_algorithm(G, quota):
 
         # new_population.sort(
         #     key=lambda item: item.fitness_value(), reverse=True)
-        continue
+        # continue
 
     best = route
-
+    route_cost.counter = 0
     return best
 
 
@@ -788,9 +798,9 @@ def drop_step(route, quota, G):
         best_economy = -math.inf
         economy_list = []
         for r in range(len(route) - 1):
-            i = route[r-1]['id']
-            j = route[r]['id']
-            s = route[r+1]['id']
+            i = route[r-1]
+            j = route[r]
+            s = route[r+1]
             k_edge1 = G.edges[i, j]
             k_edge2 = G.edges[j, s]
             edge = G.edges[i, s]
@@ -829,8 +839,8 @@ def drop_step(route, quota, G):
 #                     route.insert(1, G.nodes[k])
 #                     continue
 #                 for r in range(len(route)):
-#                     i = route[r-1]['id']
-#                     j = route[r]['id']
+#                     i = route[r-1]
+#                     j = route[r]
 #                     edge = G.edges[i, j]
 #                     k_edge1 = G.edges[i, k]
 #                     k_edge2 = G.edges[k, j]
@@ -868,8 +878,8 @@ def grasp_construction(G, quota, alfa_grasp):
         economy_list = []
         for k in range(len(G.nodes)):
             if G.nodes[k] not in route:
-                i = route[-2]['id']
-                j = route[-1]['id']
+                i = route[-2]
+                j = route[-1]
                 edge = G.edges[i, j]
                 k_edge1 = G.edges[i, k]
                 k_edge2 = G.edges[k, j]
@@ -942,12 +952,12 @@ def grasp_vns_vnd(G, quota):
             if G.nodes[k] not in route:
                 route_len = len(route)
                 if (route_len == 1):
-                    i = route[0]['id']
+                    i = route[0]
                     edge = G.edges[0, k]
                     k_economy_value = G.nodes[k]['penalty'] - edge['weight']
                 else:
-                    i = route[-2]['id']
-                    j = route[-1]['id']
+                    i = route[-2]
+                    j = route[-1]
                     edge = G.edges[i, j]
                     k_edge1 = G.edges[i, k]
                     k_edge2 = G.edges[k, j]
@@ -1123,9 +1133,9 @@ def neighboor_1(route, G):
     # print('neighboor_1')
     economy_list = []
     for r in range(len(route) - 1):
-        i = route[r-1]['id']
-        j = route[r]['id']
-        s = route[r+1]['id']
+        i = route[r-1]
+        j = route[r]
+        s = route[r+1]
         k_edge1 = G.edges[i, j]
         k_edge2 = G.edges[j, s]
         edge = G.edges[i, s]
@@ -1154,8 +1164,8 @@ def neighboor_2(route, G):
     for k in range(len(G.nodes)):
         if G.nodes[k] not in route:
             for r in range(1, len(route)):
-                i = route[r-1]['id']
-                j = route[r]['id']
+                i = route[r-1]
+                j = route[r]
                 edge = G.edges[i, j]
                 k_edge1 = G.edges[i, k]
                 k_edge2 = G.edges[k, j]

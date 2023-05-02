@@ -1,2 +1,1 @@
 iteration;duration(s);cost;route
-1;8.91;1132.0;[0, 3, 6, 1, 4, 7]
