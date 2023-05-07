@@ -129,131 +129,49 @@ recombination_rate = 0.1
 million = 1000000
 
 
-def test_algorithm(G, quota):
-
-    population = init_population(G, quota)
-    route = population[0].route
-
-    while (route_cost.counter < million):
-    # for i in range(1):
-
-        # print(route_cost.counter)
-        route_cost(route, G)
-
-        # random_children = random.choices(new_population, k=3)
-        # new_child_1 = local_search(random_children[0], quota, G)
-
-        # random_children = random.choices(new_population, k=3)
-        # new_child_2 = local_search(random_children[1], quota, G)
-
-        # random_children = random.choices(new_population, k=3)
-        # new_child_3 = local_search(random_children[2], quota, G)
-
-        # random_children = random.choices(new_population, k=3)
-
-        # children.append(new_child_1)
-        # children.append(new_child_2)
-        # children.append(new_child_3)
-
-        # new_population = [*new_population, *children]
-
-        # new_population.sort(
-        #     key=lambda item: item.fitness_value(), reverse=True)
-        # continue
-
-    best = route
-    route_cost.counter = 0
-    return best
-
-
 def memetic_algorithm(G, quota):
-    local_total = 0
-    parents_total = 0
-    recombination_total = 0
-    mutation_total = 0
-    local_mutation_total = 0
-    count_local_mutation = 0
-    count_local = 0
-
-    tic = time.perf_counter()
     population = init_population(G, quota)
-    tac = time.perf_counter()
-    print('init_population - ', tac - tic)
 
     # enquanto critério de parada não for satisfeito faça:
-    tic_while = time.perf_counter()
     while (route_cost.counter < million):
         children = []
 
         # para cada i de 1 até N (onde N é o tamanho da população) faça:
-        tic_loop = time.perf_counter()
-        # print('route_cost.counter')
-        # print(route_cost.counter)
         for i in range(population_size):
 
             # sorteie os pais. Aplique operadores (recombination, mutation).
-            tic_parents = time.perf_counter()
             parent_1 = parents_selection(population, 4)
             parent_2 = parents_selection(population, 4)
-            tac_parents = time.perf_counter()
-            # print('parents_selection', tac_parents - tic_parents)
-            parents_total += (tac_parents - tic_parents)
 
             # aplicar recombinação
             rand = random.random()
             if (rand < recombination_rate):
-                tic_recombination = time.perf_counter()
                 child_1, child_2 = recombination(parent_1, parent_2, G)
                 children.append(child_1)
                 children.append(child_2)
-                tac_recombination = time.perf_counter()
-                # print('recombination - ', tac_recombination - tic_recombination)
-                recombination_total += (tac_recombination - tic_recombination)
 
             # aplicar mutação
             if (rand < mutation_rate):
-                tic_mutation = time.perf_counter()
                 mutated = mutation(population, G)
-                tac_mutation = time.perf_counter()
-                # print('mutation - ', tac_mutation - tic_mutation)
-                mutation_total += (tac_mutation - tic_mutation)
 
                 # busca local do resultante da mutação
-                tic_mut_local = time.perf_counter()
                 new_mutated = local_search(mutated, quota, G)
-                tac_mut_local = time.perf_counter()
-                # print('local mutation - ', tac_mut_local - tic_mut_local)
-                local_mutation_total += (tac_mut_local - tic_mut_local)
                 count_local_mutation += 1
 
                 children.append(new_mutated)
             # break
-        tac_loop = time.perf_counter()
-        # print('for loop - ', tac_loop - tic_loop)
 
         # busca local de alguns filhos gerados
-        tic_search_1 = time.perf_counter()
         random_children = random.choices(population, k=3)
         new_child_1 = local_search(random_children[0], quota, G)
-        tac_search_1 = time.perf_counter()
-        # print('local_1 - ', tac_search_1 - tic_search_1)
-        local_total += (tac_search_1 - tic_search_1)
         count_local += 1
 
-        tic_search_2 = time.perf_counter()
         random_children = random.choices(population, k=3)
         new_child_2 = local_search(random_children[1], quota, G)
-        tac_search_2 = time.perf_counter()
-        # print('local_2 - ', tac_search_2 - tic_search_2)
-        local_total += (tac_search_2 - tic_search_2)
         count_local += 1
 
-        tic_search_3 = time.perf_counter()
         random_children = random.choices(population, k=3)
         new_child_3 = local_search(random_children[2], quota, G)
-        tac_search_3 = time.perf_counter()
-        # print('local_3 - ', tac_search_3 - tic_search_3)
-        local_total += (tac_search_3 - tic_search_3)
         count_local += 1
 
         children.append(new_child_1)
@@ -262,29 +180,14 @@ def memetic_algorithm(G, quota):
 
         new_population = [*population, *children]
 
-        tic_new = time.perf_counter()
         new_population.sort(
             key=lambda item: item.fitness_value(), reverse=True)
-        tac_new = time.perf_counter()
-        # print('new population - ', tac_new - tic_new)
         population = new_population[:population_size]
         # break
 
-    tac_while = time.perf_counter()
-    print('while loop - ', tac_while - tic_while)
-
     # buscar melhor solução da população
-    print('best_genetic_solution')
     best = best_genetic_solution(population)
     route_cost.counter = 0
-
-    print('local_total - ', local_total)
-    print('parents_total - ', parents_total)
-    print('recombination_total - ', recombination_total)
-    print('mutation_total - ', mutation_total)
-    print('local_mutation_total - ', local_mutation_total)
-    print('count_local - ', count_local)
-    print('count_local_mutation - ', count_local_mutation)
 
     return best
 
